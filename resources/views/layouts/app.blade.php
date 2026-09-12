@@ -48,9 +48,19 @@
                     </a>
                 @endcan
 
+                @can('viewAny', App\Models\Member::class)
+                    <a @class([
+                        'mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold',
+                        'bg-genesis-50 text-genesis-700' => request()->routeIs('members.*'),
+                        'text-slate-600 hover:bg-stone-50 hover:text-ink-950' => ! request()->routeIs('members.*'),
+                    ]) href="{{ route('members.index') }}" @if (request()->routeIs('members.*')) aria-current="page" @endif>
+                        <span @class(['size-2 rounded-full', 'bg-genesis-500' => request()->routeIs('members.*'), 'bg-stone-300' => ! request()->routeIs('members.*')]) aria-hidden="true"></span>
+                        Membros
+                    </a>
+                @endcan
+
                 <p class="px-3 pt-7 pb-2 text-xs font-semibold tracking-widest text-slate-400 uppercase">Em breve</p>
                 <div class="grid gap-1 text-sm text-slate-400" aria-label="Módulos futuros">
-                    <span class="rounded-xl px-3 py-2.5">Membros</span>
                     <span class="rounded-xl px-3 py-2.5">Usuários</span>
                     <span class="rounded-xl px-3 py-2.5">Grupos de acesso</span>
                 </div>

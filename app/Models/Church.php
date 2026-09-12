@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 #[Fillable([
@@ -36,6 +38,18 @@ class Church extends Model
     public function city(): BelongsTo
     {
         return $this->belongsTo(City::class);
+    }
+
+    public function memberMemberships(): HasMany
+    {
+        return $this->hasMany(MemberChurchMembership::class);
+    }
+
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(Member::class, 'member_church_memberships')
+            ->withPivot(['id', 'status', 'is_primary', 'joined_at', 'ended_at'])
+            ->withTimestamps();
     }
 
     protected function name(): Attribute

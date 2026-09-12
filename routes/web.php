@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MemberMembershipController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PostalCodeController;
 use App\Http\Controllers\StateCityController;
@@ -24,6 +26,16 @@ Route::middleware(['auth', 'user.active'])->group(function (): void {
 
     Route::middleware('password.changed')->group(function (): void {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+        Route::resource('members', MemberController::class)
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
+        Route::patch('/members/{member}/inactivate', [MemberController::class, 'inactivate'])
+            ->name('members.inactivate');
+        Route::prefix('/members/{member}/church-memberships')->name('members.memberships.')->group(function (): void {
+            Route::post('/', [MemberMembershipController::class, 'store'])->name('store');
+            Route::patch('/{membership}/primary', [MemberMembershipController::class, 'primary'])->name('primary');
+            Route::patch('/{membership}/end', [MemberMembershipController::class, 'end'])->name('end');
+        });
 
         Route::prefix('organization')->name('organization.')->group(function (): void {
             Route::get('/', OrganizationController::class)->name('index');

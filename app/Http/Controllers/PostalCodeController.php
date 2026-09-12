@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Church;
 use App\Models\City;
 use App\Services\PostalCodeLookupService;
 use Illuminate\Http\Client\ConnectionException;
@@ -19,7 +18,7 @@ class PostalCodeController extends Controller
      */
     public function __invoke(string $postalCode, PostalCodeLookupService $lookup): JsonResponse
     {
-        Gate::authorize('viewAny', Church::class);
+        Gate::authorize('view-localities');
 
         Validator::make(
             ['postal_code' => $postalCode],

@@ -22,7 +22,7 @@ class MemberFactory extends Factory
     {
         return [
             'name' => fake()->name(),
-            'cpf' => fake()->unique()->numerify('###########'),
+            'cpf' => $this->validCpf(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->phoneNumber(),
             'birth_date' => fake()->dateTimeBetween('-90 years', '-12 years'),
@@ -35,5 +35,25 @@ class MemberFactory extends Factory
             'city_id' => City::factory(),
             'status' => Status::Active,
         ];
+    }
+
+    private function validCpf(): string
+    {
+        do {
+            $cpf = fake()->unique()->numerify('#########');
+        } while (preg_match('/^(\d)\1{8}$/', $cpf) === 1);
+
+        for ($digit = 9; $digit < 11; $digit++) {
+            $sum = 0;
+
+            for ($position = 0; $position < $digit; $position++) {
+                $sum += ((int) $cpf[$position]) * (($digit + 1) - $position);
+            }
+
+            $verifier = (10 * $sum) % 11;
+            $cpf .= $verifier === 10 ? '0' : (string) $verifier;
+        }
+
+        return $cpf;
     }
 }

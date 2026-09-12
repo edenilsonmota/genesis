@@ -3,8 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\AccessRole;
+use App\Models\AccessRolePermission;
+use App\Models\PermissionModule;
 use App\Models\User;
 use App\Models\UserGlobalAccessRole;
+use App\PermissionLevel;
 use App\Status;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -59,6 +62,26 @@ class UserFactory extends Factory
                 'name' => 'Administrador global',
             ]);
 
+            UserGlobalAccessRole::factory()
+                ->for($user)
+                ->for($role, 'accessRole')
+                ->create();
+        });
+    }
+
+    public function withGlobalPermission(string $moduleKey, PermissionLevel $level): static
+    {
+        return $this->afterCreating(function (User $user) use ($moduleKey, $level): void {
+            $role = AccessRole::factory()->create([
+                'area_id' => null,
+                'name' => fake()->unique()->words(2, true),
+            ]);
+            $module = PermissionModule::factory()->create(['key' => $moduleKey]);
+
+            AccessRolePermission::factory()
+                ->for($role, 'accessRole')
+                ->for($module, 'permissionModule')
+                ->create(['level' => $level]);
             UserGlobalAccessRole::factory()
                 ->for($user)
                 ->for($role, 'accessRole')

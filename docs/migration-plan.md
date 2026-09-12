@@ -58,3 +58,26 @@ A migration incremental `add_ibge_codes_to_states_and_cities_tables` acrescenta 
 O catálogo é obtido exclusivamente pelo comando `php artisan ibge:download-localities`. O comando consulta a API de Localidades do IBGE, normaliza e ordena os dados e substitui atomicamente `database/data/ibge-localities.json`. O snapshot versionado registra a data da consulta, as URLs exatas e as contagens recebidas.
 
 Migrations, Seeders e testes não consultam a rede. O Seeder lê o snapshot local e usa `upsert()` por `ibge_code`, preservando os identificadores internos referenciados por membros e igrejas. Atualizar o catálogo é uma ação explícita de desenvolvimento; depois dela, o novo snapshot deve ser revisado e versionado.
+
+## Membros e vínculos com igrejas
+
+A migration incremental `create_member_church_memberships_table` materializa a relação entre `members` e `churches` somente depois que as duas tabelas existem. Ela utiliza UUID, foreign keys com `RESTRICT`, status, indicação da igreja principal, data de entrada, data opcional de encerramento e timestamps.
+
+Relacionamentos desta etapa:
+
+- `Member::memberships()` / `MemberChurchMembership::member()`;
+- `Church::memberMemberships()` / `MemberChurchMembership::church()`;
+- `Member::churches()` / `Church::members()`;
+- `Member::primaryMembership()` para o vínculo atual marcado como principal.
+
+Índices e garantias no banco:
+
+- `(member_id, status)` para a consulta dos vínculos de um membro;
+- `(church_id, status)` para consultas por igreja;
+- `member_church_memberships_active_church_unique`, índice parcial único sobre `(member_id, church_id)` quando o vínculo está ativo e não encerrado;
+- `member_church_memberships_active_primary_unique`, índice parcial único sobre `member_id` quando o vínculo está ativo, não encerrado e marcado como principal;
+- `member_church_memberships_dates_check`, que impede `ended_at` anterior a `joined_at`.
+
+O cadastro do membro e seu primeiro vínculo ativo e principal ocorre na mesma transação. Um membro ativo não pode receber vínculo duplicado com a mesma igreja, possuir duas igrejas principais nem encerrar seu único vínculo ativo. A troca da igreja principal remove a marcação anterior na mesma transação. A inativação do membro encerra todos os vínculos ativos, preserva o histórico e não altera uma eventual conta em `users`.
+
+O rollback remove primeiro `member_church_memberships`, antes de qualquer rollback de `churches` ou `members`, em respeito às dependências das foreign keys. Nenhum vínculo é excluído pelos fluxos da aplicação; encerramento e inativação são mudanças de status com registro de `ended_at`.

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\PermissionLevel;
 use App\Status;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -61,6 +62,33 @@ class User extends Authenticatable
                     ->where('fixed', true)
                     ->where('is_administrator', true)
                     ->where('status', Status::Active->value);
+            })
+            ->exists();
+    }
+
+    public function hasGlobalPermission(string $moduleKey, PermissionLevel $requiredLevel): bool
+    {
+        if ($this->isGlobalAdministrator()) {
+            return true;
+        }
+
+        $acceptedLevels = $requiredLevel === PermissionLevel::Write
+            ? [PermissionLevel::Write->value]
+            : [PermissionLevel::Read->value, PermissionLevel::Write->value];
+
+        return $this->globalAccessRoles()
+            ->effective()
+            ->whereHas('accessRole', function (Builder $query) use ($moduleKey, $acceptedLevels): void {
+                $query
+                    ->whereNull('area_id')
+                    ->where('status', Status::Active->value)
+                    ->whereHas('permissions', function (Builder $query) use ($moduleKey, $acceptedLevels): void {
+                        $query
+                            ->whereIn('level', $acceptedLevels)
+                            ->whereHas('permissionModule', fn (Builder $query): Builder => $query
+                                ->where('key', $moduleKey)
+                                ->where('status', Status::Active->value));
+                    });
             })
             ->exists();
     }
