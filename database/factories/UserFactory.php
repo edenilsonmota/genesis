@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\AccessRole;
 use App\Models\User;
+use App\Models\UserGlobalAccessRole;
 use App\Status;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -48,5 +50,19 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes): array => [
             'must_change_password' => true,
         ]);
+    }
+
+    public function globalAdministrator(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            $role = AccessRole::factory()->globalAdministrator()->create([
+                'name' => 'Administrador global',
+            ]);
+
+            UserGlobalAccessRole::factory()
+                ->for($user)
+                ->for($role, 'accessRole')
+                ->create();
+        });
     }
 }

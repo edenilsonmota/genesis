@@ -28,15 +28,29 @@
 
             <nav id="main-navigation" class="hidden px-4 pb-5 lg:block" data-navigation-panel aria-label="Navegação principal">
                 <p class="px-3 pb-2 text-xs font-semibold tracking-widest text-slate-400 uppercase">Principal</p>
-                <a class="flex items-center gap-3 rounded-xl bg-genesis-50 px-3 py-2.5 text-sm font-semibold text-genesis-700" href="{{ route('dashboard') }}" aria-current="page">
-                    <span class="size-2 rounded-full bg-genesis-500" aria-hidden="true"></span>
+                <a @class([
+                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold',
+                    'bg-genesis-50 text-genesis-700' => request()->routeIs('dashboard'),
+                    'text-slate-600 hover:bg-stone-50 hover:text-ink-950' => ! request()->routeIs('dashboard'),
+                ]) href="{{ route('dashboard') }}" @if (request()->routeIs('dashboard')) aria-current="page" @endif>
+                    <span @class(['size-2 rounded-full', 'bg-genesis-500' => request()->routeIs('dashboard'), 'bg-stone-300' => ! request()->routeIs('dashboard')]) aria-hidden="true"></span>
                     Visão geral
                 </a>
+
+                @can('viewAny', App\Models\Area::class)
+                    <a @class([
+                        'mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold',
+                        'bg-genesis-50 text-genesis-700' => request()->routeIs('organization.*'),
+                        'text-slate-600 hover:bg-stone-50 hover:text-ink-950' => ! request()->routeIs('organization.*'),
+                    ]) href="{{ route('organization.index') }}" @if (request()->routeIs('organization.*')) aria-current="page" @endif>
+                        <span @class(['size-2 rounded-full', 'bg-genesis-500' => request()->routeIs('organization.*'), 'bg-stone-300' => ! request()->routeIs('organization.*')]) aria-hidden="true"></span>
+                        Área e Igrejas
+                    </a>
+                @endcan
 
                 <p class="px-3 pt-7 pb-2 text-xs font-semibold tracking-widest text-slate-400 uppercase">Em breve</p>
                 <div class="grid gap-1 text-sm text-slate-400" aria-label="Módulos futuros">
                     <span class="rounded-xl px-3 py-2.5">Membros</span>
-                    <span class="rounded-xl px-3 py-2.5">Igrejas</span>
                     <span class="rounded-xl px-3 py-2.5">Usuários</span>
                     <span class="rounded-xl px-3 py-2.5">Grupos de acesso</span>
                 </div>

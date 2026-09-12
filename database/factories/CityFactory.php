@@ -20,6 +20,7 @@ class CityFactory extends Factory
     {
         return [
             'state_id' => State::factory(),
+            'ibge_code' => fake()->unique()->numberBetween(1_000_000, 9_999_999),
             'name' => fake()->city(),
         ];
     }

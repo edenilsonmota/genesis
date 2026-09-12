@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Sex;
 use App\Status;
 use Database\Factories\MemberFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -48,6 +49,7 @@ class Member extends Model
     {
         return [
             'birth_date' => 'date',
+            'sex' => Sex::class,
             'status' => Status::class,
         ];
     }

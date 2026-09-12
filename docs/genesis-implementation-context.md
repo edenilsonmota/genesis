@@ -87,22 +87,38 @@ Esses conceitos não são equivalentes.
 
 ## 3. Organização do domínio
 
+### Catálogo geográfico
+
+`states` e `cities` usam `ibge_code` único e têm como fonte oficial a API de Localidades do IBGE. A atualização é feita explicitamente pelo comando `php artisan ibge:download-localities`, que registra em um snapshot JSON versionado a data da obtenção e as URLs consultadas.
+
+Migrations, Seeders, testes e fluxos web não dependem da disponibilidade do IBGE. O `IbgeLocalitiesSeeder` lê somente o snapshot local e aplica estados e municípios com `upsert()` por código oficial. Esse desenho mantém instalações e pipelines reproduzíveis mesmo sem acesso à internet.
+
 ### 3.1 Área
 
-Uma área é um agrupamento administrativo de igrejas. Ela não deve ser usada como endereço da igreja.
+Uma área é a configuração organizacional principal da instalação e um agrupamento administrativo de igrejas. Ela não deve ser usada como endereço da igreja.
 
-Uma área pode:
+Cada instalação do Genesis trabalha com zero ou uma área. Depois da criação da primeira área, a aplicação e o banco PostgreSQL devem rejeitar qualquer tentativa de criar uma segunda. Essa garantia não pode depender somente de uma consulta de contagem na aplicação: `areas` possui um índice único baseado em uma expressão constante.
+
+A única área pode:
 
 - agrupar várias igrejas;
 - possuir um catálogo de cargos ou funções;
 - possuir grupos de acesso reutilizados pelas igrejas da área;
 - servir como escopo de acesso para usuários responsáveis por todas as igrejas daquela área.
 
+A área não é excluída fisicamente e não pode ser inativada enquanto possuir igrejas ativas. Sua administração ocorre na tela unificada **Área e Igrejas**, sem listagem ou seletor de áreas.
+
 ### 3.2 Igreja
 
 Cada igreja pertence a uma área e possui seu próprio endereço, incluindo `city_id`. A cidade da igreja não deve ser inferida pela área, porque futuramente uma área poderá conter igrejas de municípios diferentes.
 
+No cadastro de igreja, a aplicação utiliza automaticamente a única área existente. O formulário não aceita `area_id` como decisão de vínculo. Se ainda não existir uma área, o cadastro de igreja deve ser recusado.
+
+Ao informar um CEP completo, o formulário consulta uma rota protegida do Genesis. O backend utiliza o ViaCEP, relaciona o código IBGE retornado com o catálogo local e devolve apenas os dados necessários para preencher estado, cidade, logradouro, bairro e complemento. A integração possui timeout, cache e limite de requisições; se estiver indisponível ou o CEP não existir, o preenchimento manual continua permitido.
+
 Toda informação futura que pertença a uma igreja deve possuir `church_id` diretamente ou ser ligada a uma entidade que permita derivá-lo sem ambiguidade.
+
+As informações da área e a gestão das igrejas são apresentadas na mesma página Blade, denominada **Área e Igrejas**.
 
 ### 3.3 Departamento
 

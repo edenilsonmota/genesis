@@ -1,4 +1,5 @@
 erDiagram
+    %% Regra da instalação: AREAS possui no máximo um registro; a área única pode possuir muitas igrejas.
     STATES ||--o{ CITIES : possui
     CITIES ||--o{ CHURCHES : localiza
     CITIES ||--o{ MEMBERS : endereco
@@ -29,6 +30,7 @@ erDiagram
 
     STATES {
         integer id PK
+        integer ibge_code UK
         varchar abbreviation UK
         varchar name
     }
@@ -36,6 +38,7 @@ erDiagram
     CITIES {
         integer id PK
         integer state_id FK
+        integer ibge_code UK
         varchar name
     }
 

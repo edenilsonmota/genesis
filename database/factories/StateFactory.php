@@ -18,6 +18,7 @@ class StateFactory extends Factory
     public function definition(): array
     {
         return [
+            'ibge_code' => fake()->unique()->numberBetween(100, 32_000),
             'abbreviation' => fake()->unique()->regexify('[A-Z]{2}'),
             'name' => fake()->unique()->state(),
         ];

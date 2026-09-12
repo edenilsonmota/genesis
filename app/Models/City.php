@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['state_id', 'name'])]
+#[Fillable(['state_id', 'ibge_code', 'name'])]
 class City extends Model
 {
     /** @use HasFactory<CityFactory> */
@@ -25,5 +25,10 @@ class City extends Model
     public function members(): HasMany
     {
         return $this->hasMany(Member::class);
+    }
+
+    public function churches(): HasMany
+    {
+        return $this->hasMany(Church::class);
     }
 }

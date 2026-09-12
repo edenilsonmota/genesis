@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(GenesisAdminSeeder::class);
+        $this->call([
+            IbgeLocalitiesSeeder::class,
+            GenesisAdminSeeder::class,
+        ]);
     }
 }
