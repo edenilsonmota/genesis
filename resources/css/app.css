@@ -1,28 +1,197 @@
 @import 'tailwindcss';
+@import 'flowbite/src/themes/default';
+
+@plugin 'flowbite/plugin';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
+@source '../../node_modules/flowbite';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-    --color-genesis-50: oklch(0.975 0.018 158);
-    --color-genesis-100: oklch(0.945 0.041 158);
-    --color-genesis-500: oklch(0.58 0.13 157);
-    --color-genesis-600: oklch(0.49 0.12 158);
-    --color-genesis-700: oklch(0.41 0.1 158);
-    --color-ink-950: oklch(0.2 0.025 240);
+
+    --color-brand-primary: #0051f5;
+    --color-brand-primary-hover: #003ee5;
+    --color-brand-primary-active: #0031d1;
+    --color-brand-primary-soft: #e6f2ff;
+    --color-brand-cyan: #2bd9fb;
+    --color-brand-sky: #10b0fb;
+    --color-brand-blue: #088cf3;
+
+    --color-surface-page: #f7faff;
+    --color-surface-muted: #eef5ff;
+    --color-surface-card: #ffffff;
+    --color-border-default: #d8e5f4;
+
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #526178;
+    --color-text-disabled: #94a3b8;
+    --color-text-disabled-control: #8292a8;
+
+    --color-success: #16a36a;
+    --color-success-soft: #e8f8f0;
+    --color-warning: #d97706;
+    --color-warning-soft: #fff7e6;
+    --color-danger: #dc3545;
+    --color-danger-soft: #fdecee;
+    --color-info: #088cf3;
+    --color-info-soft: #e8f6ff;
+
+    --background-image-brand-gradient: linear-gradient(135deg, #2bd9fb 0%, #088cf3 45%, #0051f5 70%, #0031d1 100%);
+    --shadow-brand: 0 16px 40px rgb(0 81 245 / 18%);
 }
 
 @layer base {
+    html {
+        @apply bg-surface-page;
+    }
+
     body {
-        @apply bg-stone-50 text-slate-800 antialiased;
+        @apply bg-surface-page text-text-primary antialiased;
     }
 
     button,
     a,
-    input {
-        @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-genesis-600;
+    input,
+    select,
+    textarea {
+        @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan;
+    }
+
+    ::selection {
+        @apply bg-brand-cyan/35 text-text-primary;
+    }
+}
+
+@layer components {
+    .ui-card {
+        @apply rounded-3xl border border-border-default bg-surface-card shadow-sm shadow-brand-primary/5;
+    }
+
+    .ui-input,
+    .ui-select {
+        @apply block w-full rounded-xl border border-border-default bg-surface-card px-3 py-2.5 text-sm text-text-primary shadow-sm transition placeholder:text-text-disabled hover:border-brand-sky focus:border-brand-primary focus:ring-2 focus:ring-brand-cyan/35;
+    }
+
+    .ui-label {
+        @apply mb-1.5 block text-sm font-semibold text-text-secondary;
+    }
+
+    .ui-button-primary {
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-primary/20 transition hover:bg-brand-primary-hover active:bg-brand-primary-active disabled:cursor-not-allowed disabled:bg-border-default disabled:text-text-disabled-control;
+    }
+
+    .ui-button-secondary {
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-primary-soft px-4 py-2.5 text-sm font-semibold text-brand-primary-active transition hover:bg-brand-primary/15 active:bg-brand-primary/20 disabled:cursor-not-allowed disabled:bg-border-default disabled:text-text-disabled-control;
+    }
+
+    .ui-button-outline {
+        @apply inline-flex items-center justify-center rounded-xl border border-border-default bg-surface-card px-4 py-2.5 text-sm font-semibold text-text-secondary transition hover:border-brand-sky hover:bg-surface-muted hover:text-text-primary disabled:cursor-not-allowed disabled:bg-border-default disabled:text-text-disabled-control;
+    }
+
+    .ui-button-danger {
+        @apply inline-flex items-center justify-center rounded-xl border border-danger/20 bg-surface-card px-4 py-2.5 text-sm font-semibold text-danger transition hover:bg-danger-soft;
+    }
+
+    .ui-page-kicker {
+        @apply text-sm font-semibold text-brand-primary;
+    }
+
+    .ui-page-title {
+        @apply text-3xl font-semibold tracking-tight text-text-primary;
+    }
+
+    .ui-page-copy {
+        @apply text-sm leading-6 text-text-secondary;
+    }
+
+    .ui-alert-error {
+        @apply rounded-2xl border border-danger/20 bg-danger-soft px-4 py-3 text-sm text-danger;
+    }
+
+    .ui-modal-backdrop {
+        @apply fixed inset-0 z-50 overflow-y-auto bg-text-primary/45 p-4 backdrop-blur-sm;
+    }
+
+    .sidebar-item {
+        @apply relative flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-[13px] font-medium transition;
+    }
+
+    .sidebar-item-active {
+        @apply bg-brand-primary-soft text-brand-primary ring-1 ring-brand-primary/10 ring-inset;
+    }
+
+    .sidebar-item-idle {
+        @apply text-text-secondary hover:bg-surface-muted hover:text-text-primary;
+    }
+
+    .sidebar-category-toggle {
+        @apply relative flex min-h-10 w-full items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-left text-[12px] font-medium text-text-secondary transition hover:bg-surface-muted hover:text-text-primary;
+    }
+}
+
+@media (min-width: 64rem) {
+    [data-sidebar-shell] {
+        grid-template-columns: 4rem minmax(0, 1fr);
+        transition: grid-template-columns 180ms ease-out;
+    }
+
+    [data-sidebar-shell][data-sidebar-expanded='true'] {
+        grid-template-columns: 14rem minmax(0, 1fr);
+    }
+
+    [data-sidebar-shell][data-sidebar-ready='false'],
+    [data-sidebar-shell][data-sidebar-ready='false'] * {
+        transition: none !important;
+    }
+
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-text],
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-category-heading],
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-logo-name],
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-chevron] {
+        display: none;
+    }
+
+    [data-desktop-sidebar][data-expanded='false'] .sidebar-item,
+    [data-desktop-sidebar][data-expanded='false'] .sidebar-category-toggle {
+        width: 2.5rem;
+        margin-inline: auto;
+        justify-content: center;
+        padding-inline: 0;
+        gap: 0;
+    }
+
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-brand] {
+        justify-content: center;
+        padding-inline: 0;
+    }
+
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-brand] > a {
+        width: 2.5rem;
+        flex: none;
+        justify-content: center;
+        gap: 0;
+    }
+
+    [data-desktop-sidebar][data-expanded='false'] [data-sidebar-category-panel] {
+        display: none;
+    }
+
+}
+
+[data-sidebar-category-toggle][aria-expanded='true'] [data-sidebar-chevron] {
+    transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }

@@ -37,10 +37,10 @@ document.querySelectorAll('[data-member-steps]').forEach((form) => {
         panels.forEach((panel) => panel.classList.toggle('hidden', Number(panel.dataset.stepPanel) !== step));
         indicators.forEach((indicator) => {
             const active = Number(indicator.dataset.stepIndicator) === step;
-            indicator.classList.toggle('bg-genesis-600', active);
+            indicator.classList.toggle('bg-brand-primary', active);
             indicator.classList.toggle('text-white', active);
-            indicator.classList.toggle('bg-stone-100', !active);
-            indicator.classList.toggle('text-slate-600', !active);
+            indicator.classList.toggle('bg-surface-muted', !active);
+            indicator.classList.toggle('text-text-secondary', !active);
         });
     };
 

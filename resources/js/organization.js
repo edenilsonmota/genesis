@@ -72,9 +72,9 @@ document.querySelectorAll('[data-dependent-cities]').forEach((container) => {
 
     const showPostalCodeFeedback = (message, type = 'neutral') => {
         const colors = {
-            error: 'text-red-600',
-            neutral: 'text-slate-500',
-            success: 'text-emerald-700',
+            error: 'text-danger',
+            neutral: 'text-text-secondary',
+            success: 'text-success',
         };
 
         postalCodeFeedback.textContent = message;

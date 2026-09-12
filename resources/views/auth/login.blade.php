@@ -4,18 +4,18 @@
 
 @section('content')
     <header class="mb-7">
-        <p class="mb-2 text-sm font-semibold text-genesis-600">Bem-vindo</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-ink-950">Acesse sua conta</h1>
-        <p class="mt-2 text-sm leading-6 text-slate-500">Use seu nome de usuário e sua senha para continuar.</p>
+        <p class="mb-2 text-sm font-semibold text-brand-primary">Bem-vindo</p>
+        <h1 class="text-2xl font-semibold tracking-tight text-text-primary">Acesse sua conta</h1>
+        <p class="mt-2 text-sm leading-6 text-text-secondary">Use seu nome de usuário e sua senha para continuar.</p>
     </header>
 
     <form class="grid gap-5" method="POST" action="{{ route('login.store') }}">
         @csrf
 
         <div>
-            <label class="mb-2 block text-sm font-semibold text-slate-700" for="username">Nome de usuário</label>
+            <label class="ui-label mb-2" for="username">Nome de usuário</label>
             <input
-                class="block w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-ink-950 shadow-sm transition placeholder:text-slate-400 {{ $errors->has('username') ? 'border-red-400' : 'border-stone-300 hover:border-stone-400' }}"
+                class="ui-input px-3.5 py-3 {{ $errors->has('username') ? 'border-danger' : '' }}"
                 id="username"
                 name="username"
                 type="text"
@@ -28,14 +28,14 @@
                 @if ($errors->has('username')) aria-invalid="true" aria-describedby="username-error" @endif
             >
             @error('username')
-                <p class="mt-2 text-sm text-red-600" id="username-error">{{ $message }}</p>
+                <p class="mt-2 text-sm text-danger" id="username-error">{{ $message }}</p>
             @enderror
         </div>
 
         <div>
-            <label class="mb-2 block text-sm font-semibold text-slate-700" for="password">Senha</label>
+            <label class="ui-label mb-2" for="password">Senha</label>
             <input
-                class="block w-full rounded-xl border bg-white px-3.5 py-3 text-sm text-ink-950 shadow-sm transition {{ $errors->has('password') ? 'border-red-400' : 'border-stone-300 hover:border-stone-400' }}"
+                class="ui-input px-3.5 py-3 {{ $errors->has('password') ? 'border-danger' : '' }}"
                 id="password"
                 name="password"
                 type="password"
@@ -44,16 +44,16 @@
                 @if ($errors->has('password')) aria-invalid="true" aria-describedby="password-error" @endif
             >
             @error('password')
-                <p class="mt-2 text-sm text-red-600" id="password-error">{{ $message }}</p>
+                <p class="mt-2 text-sm text-danger" id="password-error">{{ $message }}</p>
             @enderror
         </div>
 
-        <label class="flex w-fit items-center gap-2.5 text-sm text-slate-600">
-            <input class="size-4 rounded border-stone-300 text-genesis-600" name="remember" type="checkbox" value="1" @checked(old('remember'))>
+        <label class="flex w-fit items-center gap-2.5 text-sm text-text-secondary">
+            <input class="size-4 rounded border-border-default accent-brand-primary" name="remember" type="checkbox" value="1" @checked(old('remember'))>
             Lembrar de mim
         </label>
 
-        <button class="rounded-xl bg-genesis-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-genesis-700" type="submit">
+        <button class="ui-button-primary py-3" type="submit">
             Entrar
         </button>
     </form>

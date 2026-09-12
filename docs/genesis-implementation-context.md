@@ -66,6 +66,10 @@ Regras para o frontend:
 - manter validações e autorização reais no servidor, ainda que a interface também forneça feedback;
 - preservar acessibilidade, mensagens de erro, valores antigos dos formulários e estados vazios.
 
+### Identidade visual do Genesis+
+
+A referência visual obrigatória está em [visual-identity.md](visual-identity.md). As telas devem consumir os tokens semânticos centralizados em `resources/css/app.css`, preservar o logo oficial em `public/images/logo.png` e aplicar os componentes visuais reutilizáveis definidos nessa referência. O Flowbite livre pode ser integrado pelo npm/Vite para interações acessíveis, sem CDN em produção e sem substituir os tokens ou as regras de autorização do Genesis+.
+
 ## 2. Princípio central
 
 O sistema deve separar quatro conceitos:

@@ -1,5 +1,6 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
+    "name": "genesis+",
     "private": true,
     "type": "module",
     "scripts": {
@@ -15,5 +16,8 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "flowbite": "^4.0.2"
     }
 }
