@@ -27,15 +27,14 @@ class PermissionModuleSeeder extends Seeder
     public static function definitions(): array
     {
         return [
-            'dashboard' => ['name' => 'Painel', 'description' => 'Acesso ao painel inicial.', 'category' => 'Geral'],
-            'members' => ['name' => 'Membros', 'description' => 'Gestão de membros.', 'category' => 'Pessoas'],
-            'users' => ['name' => 'Usuários', 'description' => 'Gestão de contas de acesso.', 'category' => 'Acesso'],
-            'access_roles' => ['name' => 'Grupos de acesso', 'description' => 'Gestão de grupos e permissões.', 'category' => 'Acesso'],
-            'positions' => ['name' => 'Cargos', 'description' => 'Gestão de cargos ministeriais.', 'category' => 'Organização'],
-            'areas' => ['name' => 'Áreas', 'description' => 'Gestão de áreas administrativas.', 'category' => 'Organização'],
-            'churches' => ['name' => 'Igrejas', 'description' => 'Gestão de igrejas.', 'category' => 'Organização'],
-            'departments' => ['name' => 'Departamentos', 'description' => 'Gestão de departamentos.', 'category' => 'Organização'],
-            'audit' => ['name' => 'Auditoria', 'description' => 'Consulta de registros de auditoria.', 'category' => 'Segurança'],
+            'dashboard' => ['name' => 'Painel', 'description' => 'Acesso ao painel inicial.', 'category' => 'Principal'],
+            'members' => ['name' => 'Membros', 'description' => 'Gestão de membros.', 'category' => 'Cadastros'],
+            'users' => ['name' => 'Usuários', 'description' => 'Gestão de contas de acesso.', 'category' => 'Administração'],
+            'positions' => ['name' => 'Cargos e permissões', 'description' => 'Gestão de cargos e das permissões que eles concedem.', 'category' => 'Administração'],
+            'areas' => ['name' => 'Áreas', 'description' => 'Gestão de áreas administrativas.', 'category' => 'Cadastros'],
+            'churches' => ['name' => 'Igrejas', 'description' => 'Gestão de igrejas.', 'category' => 'Cadastros'],
+            'departments' => ['name' => 'Departamentos', 'description' => 'Gestão de departamentos da área.', 'category' => 'Administração'],
+            'audit' => ['name' => 'Auditoria', 'description' => 'Consulta de registros de auditoria.', 'category' => 'Administração'],
         ];
     }
 }

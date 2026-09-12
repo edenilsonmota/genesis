@@ -6,8 +6,10 @@ use App\Models\City;
 use App\Models\Member;
 use App\Models\State;
 use App\Models\User;
+use App\Services\AuditService;
 use App\Services\MemberMembershipService;
 use App\Services\MemberService;
+use App\Services\PermissionService;
 use App\Status;
 use Mockery\MockInterface;
 
@@ -185,7 +187,11 @@ it('rolls back member creation when the initial membership fails', function () {
     $membershipService = $this->mock(MemberMembershipService::class, function (MockInterface $mock): void {
         $mock->shouldReceive('createInitial')->once()->andThrow(new RuntimeException('failure'));
     });
-    $service = new MemberService($membershipService);
+    $service = new MemberService(
+        $membershipService,
+        app(AuditService::class),
+        app(PermissionService::class),
+    );
     $attributes = validMemberPayload($city, $church);
     unset($attributes['state_id'], $attributes['church_id'], $attributes['joined_at'], $attributes['is_primary']);
 

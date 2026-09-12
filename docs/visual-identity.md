@@ -38,6 +38,7 @@ O gradiente institucional é `brand-gradient`: `linear-gradient(135deg, #2BD9FB 
 - Badges: estados sempre incluem texto, além de cor. O componente `x-status-badge` é a fonte padrão para status de entidades.
 - Tabelas: cabeçalho com `surface-muted`, texto secundário e borda padrão; registros preservam contraste alto. Em telas pequenas, a informação deve migrar para cards em vez de forçar rolagem horizontal desnecessária.
 - Paginação: o template local usa a ação principal na página ativa, estados desabilitados legíveis e foco nítido.
+- Matriz de permissões por cargo: os módulos são agrupados exatamente pelas categorias da sidebar — **Principal**, **Cadastros** e **Administração** — e na mesma ordem. Cada registro representa uma tela/capacidade do backend e apresenta nome, descrição e as três escolhas mutuamente exclusivas — Sem acesso, Leitura e Escrita. A relação de chaves, telas e categorias está em `docs/genesis-implementation-context.md`.
 
 ## Estados de interação
 
@@ -53,6 +54,7 @@ A fonte única dos itens da navegação é `resources/views/components/navigatio
 - Em `lg` ou maior, a sidebar permanece compacta em 64px e expande para 224px ao receber hover ou foco do teclado. Não existe botão ou chevron exclusivo para expandir a sidebar; chevrons são reservados às categorias.
 - Recolhida, ela mostra o símbolo e os ícones centralizados; expandida, mostra o nome `Genesis+`, os rótulos e as categorias. O usuário permanece no topo direito do cabeçalho, nunca no rodapé da sidebar.
 - A categoria **Cadastros** é expansível e guarda a preferência em `genesis.sidebar.registrations.open`. Uma rota de Área e Igrejas ou Membros mantém a categoria aberta para evidenciar o contexto atual.
+- A categoria **Administração** é expansível e guarda a preferência em `genesis.sidebar.administration.open`. Ela contém, nesta ordem, Usuários, Cargos e permissões e Departamentos. A matriz pertence à tela de cargos e sua taxonomia de módulos reproduz as categorias da sidebar.
 - A sidebar e o drawer usam `surface-card` como fundo, com texto escuro, bordas suaves e estado ativo em `brand-primary-soft`. O gradiente institucional fica reservado aos destaques de conteúdo, como o cabeçalho do dashboard.
 - Abaixo de `lg`, a navegação usa o drawer do Flowbite, com backdrop, fechamento por Escape, bloqueio de rolagem, foco inicial e ciclo de Tab. O botão de abertura comunica o estado por `aria-expanded`.
 - Layouts e formulários devem ser revisados, no mínimo, em 1440px, 1024px, 768px e 390px. Não ocultar uma ação essencial apenas porque a largura diminuiu.

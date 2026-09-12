@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use App\PermissionLevel;
 use App\Status;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -42,11 +39,6 @@ class User extends Authenticatable
         return $this->belongsTo(Member::class);
     }
 
-    public function globalAccessRoles(): HasMany
-    {
-        return $this->hasMany(UserGlobalAccessRole::class);
-    }
-
     public function isActive(): bool
     {
         return $this->status === Status::Active;
@@ -54,43 +46,7 @@ class User extends Authenticatable
 
     public function isGlobalAdministrator(): bool
     {
-        return $this->globalAccessRoles()
-            ->effective()
-            ->whereHas('accessRole', function (Builder $query): void {
-                $query
-                    ->whereNull('area_id')
-                    ->where('fixed', true)
-                    ->where('is_administrator', true)
-                    ->where('status', Status::Active->value);
-            })
-            ->exists();
-    }
-
-    public function hasGlobalPermission(string $moduleKey, PermissionLevel $requiredLevel): bool
-    {
-        if ($this->isGlobalAdministrator()) {
-            return true;
-        }
-
-        $acceptedLevels = $requiredLevel === PermissionLevel::Write
-            ? [PermissionLevel::Write->value]
-            : [PermissionLevel::Read->value, PermissionLevel::Write->value];
-
-        return $this->globalAccessRoles()
-            ->effective()
-            ->whereHas('accessRole', function (Builder $query) use ($moduleKey, $acceptedLevels): void {
-                $query
-                    ->whereNull('area_id')
-                    ->where('status', Status::Active->value)
-                    ->whereHas('permissions', function (Builder $query) use ($moduleKey, $acceptedLevels): void {
-                        $query
-                            ->whereIn('level', $acceptedLevels)
-                            ->whereHas('permissionModule', fn (Builder $query): Builder => $query
-                                ->where('key', $moduleKey)
-                                ->where('status', Status::Active->value));
-                    });
-            })
-            ->exists();
+        return $this->isActive() && $this->is_global_administrator;
     }
 
     protected function username(): Attribute
@@ -100,16 +56,12 @@ class User extends Authenticatable
         );
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'password' => 'hashed',
             'status' => Status::class,
+            'is_global_administrator' => 'boolean',
             'must_change_password' => 'boolean',
             'last_login_at' => 'datetime',
         ];

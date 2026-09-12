@@ -40,7 +40,7 @@
             <section class="ui-card p-6">
                 <p class="text-xs font-semibold tracking-widest text-text-disabled uppercase">Próximas entregas</p>
                 <h2 class="mt-3 text-xl font-semibold text-text-primary">Estrutura preparada para crescer</h2>
-                <p class="mt-2 text-sm leading-6 text-text-secondary">Membros, igrejas, cargos e grupos de acesso serão adicionados sem misturar dados pessoais com credenciais de autenticação.</p>
+                <p class="mt-2 text-sm leading-6 text-text-secondary">Membros, igrejas, cargos e permissões permanecem separados das credenciais de autenticação.</p>
             </section>
         </div>
     </div>

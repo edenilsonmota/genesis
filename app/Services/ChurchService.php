@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class ChurchService
 {
+    public function __construct(private AuditService $audit) {}
+
     /**
      * @param  array{city_id: int, name: string, postal_code: string, street: string, neighborhood: string, number: string, complement: ?string, status: string}  $attributes
      */
@@ -26,7 +28,10 @@ class ChurchService
                     ]);
                 }
 
-                return $area->churches()->create($attributes);
+                $church = $area->churches()->create($attributes);
+                $this->audit->record('church.created', 'churches', $church, 'church', $church->id, ['name' => $church->name]);
+
+                return $church;
             });
         } catch (QueryException $exception) {
             $this->throwDuplicateNameValidation($exception);
@@ -44,6 +49,7 @@ class ChurchService
             return DB::transaction(function () use ($church, $attributes): Church {
                 $lockedChurch = Church::query()->lockForUpdate()->findOrFail($church->getKey());
                 $lockedChurch->update($attributes);
+                $this->audit->record('church.updated', 'churches', $lockedChurch, 'church', $lockedChurch->id, ['fields' => array_keys($attributes)]);
 
                 return $lockedChurch;
             });
@@ -59,6 +65,7 @@ class ChurchService
         return DB::transaction(function () use ($church): Church {
             $lockedChurch = Church::query()->lockForUpdate()->findOrFail($church->getKey());
             $lockedChurch->update(['status' => Status::Inactive]);
+            $this->audit->record('church.inactivated', 'churches', $lockedChurch, 'church', $lockedChurch->id, ['status' => Status::Inactive->value]);
 
             return $lockedChurch;
         });

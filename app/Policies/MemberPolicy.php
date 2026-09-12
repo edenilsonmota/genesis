@@ -5,71 +5,56 @@ namespace App\Policies;
 use App\Models\Member;
 use App\Models\User;
 use App\PermissionLevel;
+use App\Services\PermissionService;
 
 class MemberPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+    public function __construct(private PermissionService $permissions) {}
+
     public function viewAny(User $user): bool
     {
-        return $user->hasGlobalPermission('members', PermissionLevel::Read);
+        return $this->permissions->can($user, 'members', PermissionLevel::Read);
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Member $member): bool
     {
-        return $user->hasGlobalPermission('members', PermissionLevel::Read);
+        if ($user->isGlobalAdministrator()) {
+            return true;
+        }
+
+        $church = $this->permissions->currentChurch($user);
+
+        return $church !== null
+            && $this->viewAny($user)
+            && $member->memberships()->effectiveOn(today()->toDateString())->where('church_id', $church->id)->exists();
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasGlobalPermission('members', PermissionLevel::Write);
+        return $this->permissions->can($user, 'members', PermissionLevel::Write);
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Member $member): bool
     {
-        return $user->hasGlobalPermission('members', PermissionLevel::Write);
+        return $this->create($user) && $this->view($user, $member);
     }
 
     public function inactivate(User $user, Member $member): bool
     {
-        return $user->hasGlobalPermission('members', PermissionLevel::Write);
+        return $user->isGlobalAdministrator();
     }
 
     public function manageMemberships(User $user, Member $member): bool
     {
-        return $user->hasGlobalPermission('members', PermissionLevel::Write);
+        return $user->isGlobalAdministrator();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
+    public function managePositions(User $user, Member $member): bool
+    {
+        return $this->permissions->can($user, 'positions', PermissionLevel::Write) && $this->view($user, $member);
+    }
+
     public function delete(User $user, Member $member): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Member $member): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Member $member): bool
     {
         return false;
     }

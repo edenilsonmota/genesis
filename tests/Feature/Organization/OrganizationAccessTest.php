@@ -24,7 +24,7 @@ it('redirects a visitor to login', function () {
 });
 
 it('returns 403 to an authenticated user without global permission', function () {
-    $user = User::factory()->create();
+    $user = userWithPermission('dashboard');
 
     $response = $this->actingAs($user)->get(route('organization.index'));
 
@@ -36,7 +36,7 @@ it('protects every organization write route in the backend', function () {
     $state = State::factory()->create();
     $city = City::factory()->for($state)->create();
     $church = Church::factory()->for($area)->for($city)->create();
-    $user = User::factory()->create();
+    $user = userWithPermission('dashboard', church: $church);
 
     $responses = [
         $this->actingAs($user)->post(route('organization.area.store'), []),

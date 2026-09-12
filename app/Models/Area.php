@@ -18,14 +18,19 @@ class Area extends Model
     /** @use HasFactory<AreaFactory> */
     use HasFactory, HasUuids;
 
-    public function accessRoles(): HasMany
+    public function departments(): HasMany
     {
-        return $this->hasMany(AccessRole::class);
+        return $this->hasMany(Department::class);
     }
 
     public function churches(): HasMany
     {
         return $this->hasMany(Church::class);
+    }
+
+    public function positions(): HasMany
+    {
+        return $this->hasMany(Position::class);
     }
 
     protected function name(): Attribute

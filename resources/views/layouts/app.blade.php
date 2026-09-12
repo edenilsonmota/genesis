@@ -32,6 +32,20 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2" data-header-user>
+                        @if (($availableAccessChurches ?? collect())->isNotEmpty())
+                            <form class="hidden md:block" method="POST" action="{{ route('active-church.update') }}">
+                                @csrf
+                                @method('PATCH')
+                                <label class="sr-only" for="active_church_id">Igreja ativa</label>
+                                <select class="ui-select max-w-52 py-2 text-xs" id="active_church_id" name="church_id" onchange="this.form.submit()" aria-label="Igreja ativa">
+                                    @foreach ($availableAccessChurches as $accessChurch)
+                                        <option value="{{ $accessChurch->id }}" @selected(($activeChurch?->id ?? null) === $accessChurch->id)>{{ $accessChurch->name }}</option>
+                                    @endforeach
+                                </select>
+                            </form>
+                        @elseif (auth()->user()->isGlobalAdministrator())
+                            <span class="hidden text-xs font-semibold text-text-secondary md:inline">Escopo global</span>
+                        @endif
                         <div class="hidden items-center gap-2.5 rounded-full border border-border-default bg-surface-card px-2.5 py-1.5 sm:flex">
                             <span class="grid size-7 shrink-0 place-items-center rounded-full bg-brand-primary-soft text-xs font-semibold text-brand-primary" aria-hidden="true">{{ str(auth()->user()->display_name)->substr(0, 1)->upper() }}</span>
                             <div class="min-w-0 pr-1">

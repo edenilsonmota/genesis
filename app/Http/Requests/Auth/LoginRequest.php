@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Services\PermissionService;
 use App\Status;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -35,7 +36,7 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    public function authenticate(): void
+    public function authenticate(PermissionService $permissions): void
     {
         $this->ensureIsNotRateLimited();
 
@@ -50,6 +51,16 @@ class LoginRequest extends FormRequest
 
             throw ValidationException::withMessages([
                 'username' => 'As credenciais informadas não são válidas.',
+            ]);
+        }
+
+        $user = Auth::user();
+        if ($user === null || ! $permissions->hasSystemAccess($user)) {
+            Auth::guard('web')->logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'username' => 'Seu acesso ao sistema não está disponível. Procure um administrador.',
             ]);
         }
 

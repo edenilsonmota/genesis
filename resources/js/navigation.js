@@ -8,9 +8,6 @@ if (shell) {
     const mobileOpenButton = document.querySelector('[data-mobile-sidebar-open]');
     const mobileCloseButton = document.querySelector('[data-mobile-sidebar-close]');
     const desktopMediaQuery = window.matchMedia('(min-width: 64rem)');
-    const storageKeys = {
-        registrations: 'genesis.sidebar.registrations.open',
-    };
     let mobileDrawer;
     let lastFocusedElement;
     let pointerInsideDesktopSidebar = false;
@@ -47,7 +44,7 @@ if (shell) {
         });
 
         if (persist) {
-            saveBoolean(storageKeys[category], isOpen);
+            saveBoolean(`genesis.sidebar.${category}.open`, isOpen);
         }
     };
 
@@ -64,7 +61,16 @@ if (shell) {
     };
 
     setDesktopSidebar(false);
-    setCategory('registrations', isCategoryActive('registrations') || getStoredBoolean(storageKeys.registrations, true), false);
+    [...new Set([...document.querySelectorAll('[data-sidebar-category-toggle]')]
+        .map((toggle) => toggle.dataset.sidebarCategory)
+        .filter(Boolean))]
+        .forEach((category) => {
+            setCategory(
+                category,
+                isCategoryActive(category) || getStoredBoolean(`genesis.sidebar.${category}.open`, true),
+                false,
+            );
+        });
     requestAnimationFrame(() => {
         shell.dataset.sidebarReady = 'true';
     });

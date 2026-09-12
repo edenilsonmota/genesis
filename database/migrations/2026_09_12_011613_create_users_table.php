@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->boolean('is_global_administrator')->default(false);
             $table->boolean('must_change_password')->default(true);
             $table->timestamp('last_login_at')->nullable();
             $table->timestamps();

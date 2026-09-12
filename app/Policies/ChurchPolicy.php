@@ -4,36 +4,29 @@ namespace App\Policies;
 
 use App\Models\Church;
 use App\Models\User;
+use App\PermissionLevel;
+use App\Services\PermissionService;
 
 class ChurchPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+    public function __construct(private PermissionService $permissions) {}
+
     public function viewAny(User $user): bool
     {
-        return $user->isGlobalAdministrator();
+        return $this->permissions->can($user, 'churches', PermissionLevel::Read);
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Church $church): bool
     {
-        return $user->isGlobalAdministrator();
+        return $this->permissions->can($user, 'churches', PermissionLevel::Read, $church)
+            && $this->permissions->canAccessChurch($user, $church);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
         return $user->isGlobalAdministrator();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Church $church): bool
     {
         return $user->isGlobalAdministrator();
@@ -44,26 +37,7 @@ class ChurchPolicy
         return $user->isGlobalAdministrator();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Church $church): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Church $church): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Church $church): bool
     {
         return false;
     }

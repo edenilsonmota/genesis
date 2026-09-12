@@ -6,27 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('access_role_permissions', function (Blueprint $table) {
+        Schema::create('position_permissions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('access_role_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('position_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('permission_module_id')->constrained()->cascadeOnDelete();
             $table->enum('level', ['read', 'write']);
             $table->timestamps();
-
-            $table->unique(['access_role_id', 'permission_module_id']);
+            $table->unique(['position_id', 'permission_module_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('access_role_permissions');
+        Schema::dropIfExists('position_permissions');
     }
 };

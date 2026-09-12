@@ -3,22 +3,22 @@
 namespace App\Models;
 
 use App\PermissionLevel;
-use Database\Factories\AccessRolePermissionFactory;
+use Database\Factories\PositionPermissionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['access_role_id', 'permission_module_id', 'level'])]
-class AccessRolePermission extends Model
+#[Fillable(['position_id', 'permission_module_id', 'level'])]
+class PositionPermission extends Model
 {
-    /** @use HasFactory<AccessRolePermissionFactory> */
+    /** @use HasFactory<PositionPermissionFactory> */
     use HasFactory, HasUuids;
 
-    public function accessRole(): BelongsTo
+    public function position(): BelongsTo
     {
-        return $this->belongsTo(AccessRole::class);
+        return $this->belongsTo(Position::class);
     }
 
     public function permissionModule(): BelongsTo
@@ -26,13 +26,8 @@ class AccessRolePermission extends Model
         return $this->belongsTo(PermissionModule::class);
     }
 
-    /**
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
-        return [
-            'level' => PermissionLevel::class,
-        ];
+        return ['level' => PermissionLevel::class];
     }
 }

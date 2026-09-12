@@ -1,11 +1,43 @@
-# Genesis
+# Genesis+
 
-## Catálogo de estados e municípios
+Sistema web Laravel para gestão de igrejas, membros, cargos e acesso por permissões herdadas.
 
-O catálogo geográfico é mantido no snapshot versionado `database/data/ibge-localities.json`. Para atualizá-lo a partir da API oficial de Localidades do IBGE:
+## Modelo de acesso
+
+- membro é uma pessoa e pode existir sem usuário;
+- usuário é somente a credencial vinculada ao membro;
+- cargos são atribuídos ao vínculo do membro com uma igreja;
+- somente cargos ativos com “concede acesso ao sistema” permitem login;
+- permissões de leitura e escrita pertencem diretamente ao cargo e são calculadas por igreja;
+- departamentos pertencem à área e servem apenas para categorizar cargos;
+- o administrador global é uma conta técnica protegida criada pelo Seeder.
+
+Na sidebar, Administração contém **Usuários**, **Cargos e permissões** e **Departamentos**. Consulte [contexto de implementação](docs/genesis-implementation-context.md), [modelo de domínio](docs/genesis-domain-model.mmd), [plano de migrations](docs/migration-plan.md) e [identidade visual](docs/visual-identity.md).
+
+## Instalação local
+
+Configure `.env`, incluindo as credenciais técnicas:
+
+```dotenv
+GENESIS_ADMIN_NAME="Administrador Genesis"
+GENESIS_ADMIN_USERNAME=genesis.admin
+GENESIS_ADMIN_PASSWORD="uma-senha-segura"
+```
+
+Em um banco local que possa ser recriado:
+
+```bash
+./vendor/bin/sail artisan migrate:fresh --seed
+npm run build
+./vendor/bin/sail artisan test --compact
+```
+
+## Catálogo de localidades
+
+O Seeder lê exclusivamente o snapshot versionado `database/data/ibge-localities.json`. Para atualizá-lo explicitamente pela API oficial do IBGE:
 
 ```bash
 ./vendor/bin/sail artisan ibge:download-localities
 ```
 
-Depois, revise e versione a alteração do snapshot. O `DatabaseSeeder` consome somente esse arquivo local; migrations, Seeders e testes não fazem requisições externas.
+Revise e versione o snapshot após a atualização. Migrations, Seeders e testes não acessam serviços externos.

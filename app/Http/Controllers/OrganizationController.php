@@ -7,6 +7,7 @@ use App\Models\Area;
 use App\Models\Church;
 use App\Models\City;
 use App\Models\State;
+use App\Services\PermissionService;
 use App\Status;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
@@ -16,9 +17,10 @@ class OrganizationController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(IndexOrganizationRequest $request): View
+    public function __invoke(IndexOrganizationRequest $request, PermissionService $permissions): View
     {
         $filters = $request->safe()->only(['search', 'status', 'state_id', 'city_id', 'panel', 'church']);
+        $currentChurch = $permissions->currentChurch($request->user());
 
         $area = Area::query()
             ->withCount([
@@ -30,6 +32,7 @@ class OrganizationController extends Controller
 
         $churches = Church::query()
             ->with(['city.state'])
+            ->when(! $request->user()->isGlobalAdministrator(), fn (Builder $query): Builder => $query->whereKey($currentChurch?->id))
             ->when(
                 $area === null,
                 fn (Builder $query): Builder => $query->whereRaw('false'),
@@ -59,6 +62,7 @@ class OrganizationController extends Controller
             $selectedChurch = Church::query()
                 ->with(['city.state'])
                 ->whereBelongsTo($area)
+                ->when(! $request->user()->isGlobalAdministrator(), fn (Builder $query): Builder => $query->whereKey($currentChurch?->id))
                 ->findOrFail($filters['church']);
         }
 

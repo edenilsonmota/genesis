@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Status;
 use Database\Factories\ChurchFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,6 +52,12 @@ class Church extends Model
         return $this->belongsToMany(Member::class, 'member_church_memberships')
             ->withPivot(['id', 'status', 'is_primary', 'joined_at', 'ended_at'])
             ->withTimestamps();
+    }
+
+    #[Scope]
+    protected function active(Builder $query): Builder
+    {
+        return $query->where('status', Status::Active->value);
     }
 
     protected function name(): Attribute

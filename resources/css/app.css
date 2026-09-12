@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'flowbite/src/themes/default';
+@import 'choices.js/public/assets/styles/choices.min.css';
 
 @plugin 'flowbite/plugin';
 
@@ -113,6 +114,38 @@
 
     .ui-modal-backdrop {
         @apply fixed inset-0 z-50 overflow-y-auto bg-text-primary/45 p-4 backdrop-blur-sm;
+    }
+
+    .choices {
+        --choices-bg-color: var(--color-surface-card);
+        --choices-bg-color-dropdown: var(--color-surface-card);
+        --choices-highlighted-color: var(--color-surface-muted);
+        --choices-keyline-color: var(--color-border-default);
+        --choices-text-color: var(--color-text-primary);
+        --choices-primary-color: var(--color-brand-primary);
+        --choices-border-radius: 0.75rem;
+        --choices-guttering: 0;
+        --choices-input-height: 44px;
+        --choices-dropdown-item-padding: 0.625rem 0.75rem;
+        @apply text-sm text-text-primary;
+    }
+
+    .choices__inner {
+        @apply border-border-default bg-surface-card px-3 py-2.5 text-text-primary shadow-sm transition hover:border-brand-sky;
+    }
+
+    .is-focused .choices__inner,
+    .is-open .choices__inner {
+        @apply border-brand-primary ring-2 ring-brand-cyan/35;
+    }
+
+    .choices__input {
+        @apply bg-surface-card text-text-primary placeholder:text-text-disabled;
+    }
+
+    .choices__list--dropdown,
+    .choices__list[aria-expanded] {
+        @apply border-border-default bg-surface-card shadow-lg shadow-brand-primary/10;
     }
 
     .sidebar-item {

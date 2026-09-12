@@ -2,12 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\AccessRole;
-use App\Models\AccessRolePermission;
-use App\Models\PermissionModule;
+use App\Models\AuditLog;
 use App\Models\User;
-use App\Models\UserGlobalAccessRole;
-use App\PermissionLevel;
 use App\Status;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -18,9 +14,6 @@ use LogicException;
 
 class GenesisAdminSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $configuration = [
@@ -31,14 +24,7 @@ class GenesisAdminSeeder extends Seeder
 
         $validator = Validator::make($configuration, [
             'name' => ['required', 'string', 'max:255'],
-            'username' => [
-                'required',
-                'string',
-                'min:3',
-                'max:50',
-                'regex:/\A[a-z0-9._-]+\z/',
-                Rule::notIn(['root', 'support', 'system']),
-            ],
+            'username' => ['required', 'string', 'min:3', 'max:50', 'regex:/\A[a-z0-9._-]+\z/', Rule::notIn(['root', 'support', 'system'])],
             'password' => ['required', 'string', 'min:12'],
         ]);
 
@@ -51,61 +37,51 @@ class GenesisAdminSeeder extends Seeder
 
         DB::transaction(function () use ($admin): void {
             $this->call(PermissionModuleSeeder::class);
-
-            $role = AccessRole::query()
-                ->whereNull('area_id')
-                ->where('name', 'Administrador global')
-                ->lockForUpdate()
-                ->firstOrNew();
-
-            $role->fill([
-                'area_id' => null,
-                'name' => 'Administrador global',
-                'description' => 'Administração técnica de todo o sistema Genesis.',
-                'fixed' => true,
-                'is_administrator' => true,
-                'status' => Status::Active,
-            ])->save();
-
-            PermissionModule::query()->each(function (PermissionModule $module) use ($role): void {
-                AccessRolePermission::query()->updateOrCreate(
-                    [
-                        'access_role_id' => $role->id,
-                        'permission_module_id' => $module->id,
-                    ],
-                    ['level' => PermissionLevel::Write],
-                );
-            });
-
-            $user = User::query()
-                ->whereRaw('LOWER(username) = ?', [$admin['username']])
-                ->lockForUpdate()
-                ->first();
+            $user = User::query()->whereRaw('LOWER(username) = ?', [$admin['username']])->lockForUpdate()->first();
 
             if ($user?->member_id !== null) {
                 throw new LogicException('O username configurado já pertence a um usuário local.');
             }
 
             if ($user === null) {
-                $user = User::query()->create([
+                $user = new User;
+                $user->forceFill([
                     'member_id' => null,
                     'display_name' => $admin['name'],
                     'username' => $admin['username'],
                     'password' => Hash::make($admin['password']),
                     'status' => Status::Active,
+                    'is_global_administrator' => true,
                     'must_change_password' => true,
+                ])->save();
+
+                AuditLog::query()->create([
+                    'action' => 'global_administrator.created',
+                    'resource' => 'users',
+                    'record_id' => $user->id,
+                    'scope_type' => 'global',
+                    'details' => ['username' => $user->username],
                 ]);
+
+                return;
             }
 
-            UserGlobalAccessRole::query()->firstOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'access_role_id' => $role->id,
-                    'status' => Status::Active,
-                    'ended_at' => null,
-                ],
-                ['started_at' => today()],
-            );
+            $changed = ! $user->is_global_administrator || $user->status !== Status::Active || $user->display_name !== $admin['name'];
+            $user->forceFill([
+                'display_name' => $admin['name'],
+                'status' => Status::Active,
+                'is_global_administrator' => true,
+            ])->save();
+
+            if ($changed) {
+                AuditLog::query()->create([
+                    'action' => 'global_administrator.restored',
+                    'resource' => 'users',
+                    'record_id' => $user->id,
+                    'scope_type' => 'global',
+                    'details' => ['username' => $user->username],
+                ]);
+            }
         });
     }
 }

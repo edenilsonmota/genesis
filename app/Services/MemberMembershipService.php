@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Church;
 use App\Models\Member;
 use App\Models\MemberChurchMembership;
+use App\PermissionLevel;
 use App\Status;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
@@ -13,6 +14,11 @@ use Illuminate\Validation\ValidationException;
 
 class MemberMembershipService
 {
+    public function __construct(
+        private AuditService $audit,
+        private PermissionService $permissions,
+    ) {}
+
     public function createInitial(Member $member, Church $church, string $joinedAt): MemberChurchMembership
     {
         return $this->createMembership($member, $church, $joinedAt, true);
@@ -48,6 +54,7 @@ class MemberMembershipService
                 ->update(['is_primary' => false]);
 
             $target->update(['is_primary' => true]);
+            $this->audit->record('membership.primary_changed', 'member_church_memberships', $target, 'church', $target->church_id, ['member_id' => $lockedMember->id]);
 
             return $target->refresh();
         });
@@ -83,11 +90,19 @@ class MemberMembershipService
                 ]);
             }
 
+            $target->loadMissing(['church', 'member.user']);
+            $user = $target->member->user;
+            if ($user !== null && $this->permissions->can($user, 'users', PermissionLevel::Write, $target->church)
+                && ! $this->permissions->hasOtherChurchAdministrator($target->church, excludedUserId: $user->id)) {
+                throw ValidationException::withMessages(['membership' => "Não é possível encerrar o vínculo do último administrador válido de {$target->church->name}."]);
+            }
+
             $target->update([
                 'status' => Status::Inactive,
                 'is_primary' => false,
                 'ended_at' => today(),
             ]);
+            $this->audit->record('membership.ended', 'member_church_memberships', $target, 'church', $target->church_id, ['member_id' => $lockedMember->id]);
 
             return $target->refresh();
         });
@@ -141,13 +156,16 @@ class MemberMembershipService
                     ]);
                 }
 
-                return $lockedMember->memberships()->create([
+                $membership = $lockedMember->memberships()->create([
                     'church_id' => $lockedChurch->getKey(),
                     'status' => Status::Active,
                     'is_primary' => $initial || $activeMemberships->isEmpty(),
                     'joined_at' => $date,
                     'ended_at' => null,
                 ]);
+                $this->audit->record('membership.created', 'member_church_memberships', $membership, 'church', $lockedChurch->id, ['member_id' => $lockedMember->id]);
+
+                return $membership;
             });
         } catch (QueryException $exception) {
             if ($exception->getCode() === '23505') {

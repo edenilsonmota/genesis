@@ -1,46 +1,30 @@
 <?php
 
-use App\Models\AccessRole;
 use App\Models\User;
-use App\Models\UserGlobalAccessRole;
+use App\PermissionLevel;
 
 it('redirects a visitor to login', function () {
-    $response = $this->get(route('dashboard'));
-
-    $response->assertRedirect(route('login'));
+    $this->get(route('dashboard'))->assertRedirect(route('login'));
 });
 
-it('renders the authenticated user identity', function () {
-    $user = User::factory()->create([
-        'display_name' => 'Ana Oliveira',
-        'username' => 'ana.oliveira',
-    ]);
+it('renders an eligible authenticated user identity', function () {
+    $user = User::factory()->create(['display_name' => 'Ana Oliveira', 'username' => 'ana.oliveira']);
+    grantPermissionToUser($user, 'dashboard', PermissionLevel::Read);
 
-    $response = $this->actingAs($user)->get(route('dashboard'));
-
-    $response
-        ->assertSee('Ana Oliveira')
-        ->assertSee('@ana.oliveira')
-        ->assertDontSee('Administrador global');
+    $this->actingAs($user)->get(route('dashboard'))->assertSee('Ana Oliveira')->assertSee('@ana.oliveira')->assertDontSee('Administrador global');
 });
 
-it('identifies an effective global administrator', function () {
+it('identifies a protected global administrator', function () {
+    $user = User::factory()->globalAdministrator()->create();
+
+    $this->actingAs($user)->get(route('dashboard'))->assertSee('Administrador global');
+});
+
+it('invalidates a session after user or cargo access is revoked', function () {
     $user = User::factory()->create();
-    $role = AccessRole::factory()->globalAdministrator()->create([
-        'name' => 'Administrador global',
-    ]);
-    UserGlobalAccessRole::factory()->for($user)->for($role, 'accessRole')->create();
+    grantPermissionToUser($user, 'dashboard');
+    $user->member->positionAssignments()->update(['status' => 'inactive', 'ended_at' => today()]);
 
-    $response = $this->actingAs($user)->get(route('dashboard'));
-
-    $response->assertSee('Administrador global');
-});
-
-it('invalidates an authenticated session after the user is inactivated', function () {
-    $user = User::factory()->inactive()->create();
-
-    $response = $this->actingAs($user)->get(route('dashboard'));
-
-    $response->assertRedirect(route('login'));
+    $this->actingAs($user)->get(route('dashboard'))->assertRedirect(route('login'));
     $this->assertGuest();
 });

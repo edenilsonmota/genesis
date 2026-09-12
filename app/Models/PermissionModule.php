@@ -16,9 +16,9 @@ class PermissionModule extends Model
     /** @use HasFactory<PermissionModuleFactory> */
     use HasFactory, HasUuids;
 
-    public function accessRolePermissions(): HasMany
+    public function positionPermissions(): HasMany
     {
-        return $this->hasMany(AccessRolePermission::class);
+        return $this->hasMany(PositionPermission::class);
     }
 
     /**

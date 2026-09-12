@@ -7,6 +7,7 @@
     @php
         $cpf = substr($member->cpf, 0, 3).'.'.substr($member->cpf, 3, 3).'.'.substr($member->cpf, 6, 3).'-'.substr($member->cpf, 9);
         $activeMemberships = $member->memberships->filter(fn ($membership) => $membership->status === App\Status::Active && $membership->ended_at === null);
+        $positionAssignments = $member->memberships->flatMap(fn ($membership) => $membership->positionAssignments);
     @endphp
     <div class="mx-auto grid max-w-6xl gap-7">
         <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -15,7 +16,7 @@
                 <div class="flex flex-wrap gap-2">
                     <a class="ui-button-outline" href="{{ route('members.edit', $member) }}">Editar dados</a>
                     @if ($member->status === App\Status::Active)
-                        <form method="POST" action="{{ route('members.inactivate', $member) }}" data-confirm="Inativar o membro e encerrar todos os vínculos ativos? O acesso de usuário, se existir, não será alterado.">@csrf @method('PATCH')<button class="ui-button-danger" type="submit">Inativar membro</button></form>
+                        <form method="POST" action="{{ route('members.inactivate', $member) }}" data-confirm="Inativar o membro e encerrar todos os vínculos ativos? Um usuário vinculado perderá o acesso imediatamente.">@csrf @method('PATCH')<button class="ui-button-danger" type="submit">Inativar membro</button></form>
                     @endif
                 </div>
             @endcan
@@ -43,7 +44,13 @@
                     <div class="mt-3"><x-status-badge :status="$member->user->status" /></div>
                 @else
                     <h2 class="mt-3 font-semibold text-text-primary">Sem usuário vinculado</h2>
-                    <p class="mt-2 text-sm leading-6 text-text-secondary">O cadastro de membro não cria acesso ao sistema.</p>
+                    @if ($hasEligibleAccessPosition)
+                        <p class="mt-2 text-sm leading-6 text-text-secondary">Este membro já possui cargo que concede acesso e pode receber uma credencial.</p>
+                        @can('create', App\Models\User::class)<a class="mt-4 inline-flex text-sm font-semibold text-brand-primary" href="{{ route('users.create', ['member_id' => $member->id]) }}">Criar usuário →</a>@endcan
+                    @else
+                        <p class="mt-2 text-sm leading-6 text-text-secondary">Este membro ainda não possui um cargo que conceda acesso ao sistema. Vincule um cargo com acesso antes de criar o usuário.</p>
+                        <a class="mt-4 inline-flex text-sm font-semibold text-brand-primary" href="#positions-title">Ir para Cargos ↓</a>
+                    @endif
                 @endif
             </aside>
         </div>
@@ -90,6 +97,21 @@
                     @endforeach
                 </div>
             @endif
+        </section>
+
+        <section class="ui-card overflow-hidden" aria-labelledby="positions-title">
+            <div class="border-b border-border-default p-6 sm:px-8"><h2 class="text-xl font-semibold text-text-primary" id="positions-title">Cargos</h2><p class="mt-1 text-sm text-text-secondary">O departamento é derivado do cargo. O histórico permanece após o encerramento.</p></div>
+            @can('managePositions', $member)
+                @if($activeMemberships->isNotEmpty() && $positions->isNotEmpty())
+                    <form class="grid gap-4 border-b border-border-default bg-surface-muted/60 p-6 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_12rem_auto] sm:px-8" method="POST" action="{{ route('members.positions.store', $member) }}">@csrf
+                        <div><label class="ui-label text-xs" for="member_church_membership_id">Igreja</label><select class="ui-select" id="member_church_membership_id" name="member_church_membership_id" required><option value="">Selecione</option>@foreach($activeMemberships as $membership)<option value="{{ $membership->id }}">{{ $membership->church->name }}</option>@endforeach</select></div>
+                        <div><label class="ui-label text-xs" for="position_id">Cargo</label><select class="ui-select" id="position_id" name="position_id" required><option value="">Selecione</option>@foreach($positions as $position)<option value="{{ $position->id }}">{{ $position->name }}{{ $position->department ? ' · '.$position->department->name : '' }}{{ $position->grants_system_access ? ' · concede acesso' : '' }}</option>@endforeach</select></div>
+                        <div><label class="ui-label text-xs" for="started_at">Início</label><input class="ui-input" id="started_at" name="started_at" type="date" value="{{ today()->toDateString() }}" required></div>
+                        <div class="flex items-end"><button class="ui-button-primary w-full">Atribuir</button></div>
+                    </form>
+                @endif
+            @endcan
+            <div class="divide-y divide-border-default">@forelse($positionAssignments->sortByDesc('started_at') as $assignment)<article class="grid gap-4 p-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_12rem_10rem_auto] lg:items-center"><div><h3 class="font-semibold text-text-primary">{{ $assignment->position->name }}</h3><p class="mt-1 text-sm text-text-secondary">{{ $member->memberships->firstWhere('id', $assignment->member_church_membership_id)?->church->name }} · {{ $assignment->position->department?->name ?? 'Sem departamento' }}{{ $assignment->position->grants_system_access ? ' · concede acesso' : '' }}</p></div><p class="text-sm text-text-secondary">{{ $assignment->started_at->format('d/m/Y') }} — {{ $assignment->ended_at?->format('d/m/Y') ?? 'atual' }}</p><x-status-badge :status="$assignment->status"/><div>@if($assignment->status === App\Status::Active && $assignment->ended_at === null)@can('managePositions', $member)<form class="flex gap-2" method="POST" action="{{ route('members.positions.end', [$member, $assignment]) }}" data-confirm="Encerrar este cargo? O acesso herdado pode ser revogado imediatamente.">@csrf @method('PATCH')<input class="ui-input w-36 py-2 text-xs" type="date" name="ended_at" min="{{ $assignment->started_at->toDateString() }}" value="{{ today()->toDateString() }}" required><button class="ui-button-danger px-3 py-2 text-xs">Encerrar</button></form>@endcan @endif</div></article>@empty<p class="p-8 text-center text-sm text-text-secondary">Nenhum cargo atribuído.</p>@endforelse</div>
         </section>
     </div>
 @endsection

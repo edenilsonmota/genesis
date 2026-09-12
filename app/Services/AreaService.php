@@ -10,6 +10,8 @@ use Illuminate\Validation\ValidationException;
 
 class AreaService
 {
+    public function __construct(private AuditService $audit) {}
+
     /**
      * @param  array{name: string, description: ?string, status: string}  $attributes
      */
@@ -25,7 +27,10 @@ class AreaService
                     ]);
                 }
 
-                return Area::query()->create($attributes);
+                $area = Area::query()->create($attributes);
+                $this->audit->record('area.created', 'areas', $area, 'area', $area->id, $area->only(['name', 'description', 'status']));
+
+                return $area;
             });
         } catch (QueryException $exception) {
             if ($this->isSingletonViolation($exception)) {
@@ -54,6 +59,7 @@ class AreaService
             }
 
             $lockedArea->update($attributes);
+            $this->audit->record('area.updated', 'areas', $lockedArea, 'area', $lockedArea->id, ['fields' => array_keys($attributes)]);
 
             return $lockedArea;
         });
