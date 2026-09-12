@@ -14,6 +14,8 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         '2026_09_12_164836_create_position_permissions_table.php',
         '2026_09_12_164837_create_audit_logs_table.php',
         '2026_09_12_164838_normalize_department_and_position_names.php',
+        '2026_09_12_230820_create_financial_accounts_table.php',
+        '2026_09_12_230821_create_financial_categories_table.php',
     ];
     $migrations = collect($files)->map(fn (string $file) => require database_path('migrations/'.$file));
 
@@ -28,6 +30,8 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         ->and(Schema::hasTable('member_position_assignments'))->toBeTrue()
         ->and(Schema::hasTable('position_permissions'))->toBeTrue()
         ->and(Schema::hasTable('audit_logs'))->toBeTrue()
+        ->and(Schema::hasTable('financial_accounts'))->toBeTrue()
+        ->and(Schema::hasTable('financial_categories'))->toBeTrue()
         ->and(DB::table('pg_constraint')->whereIn('conname', ['departments_name_uppercase_check', 'positions_name_uppercase_check'])->count())->toBe(2)
         ->and(DB::table('pg_indexes')->where('indexname', 'areas_singleton_unique')->exists())->toBeTrue();
 });

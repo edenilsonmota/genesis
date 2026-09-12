@@ -35,6 +35,12 @@ class PermissionModuleSeeder extends Seeder
             'churches' => ['name' => 'Igrejas', 'description' => 'Gestão de igrejas.', 'category' => 'Cadastros'],
             'departments' => ['name' => 'Departamentos', 'description' => 'Gestão de departamentos da área.', 'category' => 'Administração'],
             'audit' => ['name' => 'Auditoria', 'description' => 'Consulta de registros de auditoria.', 'category' => 'Administração'],
+            'finance.overview' => ['name' => 'Visão financeira', 'description' => 'Consulta consolidada de saldos, entradas e saídas.', 'category' => 'Financeiro'],
+            'finance.transactions' => ['name' => 'Movimentações financeiras', 'description' => 'Gestão de entradas, despesas, ajustes e transferências.', 'category' => 'Financeiro'],
+            'finance.tithes' => ['name' => 'Dízimos', 'description' => 'Gestão do recebimento de dízimos.', 'category' => 'Financeiro'],
+            'finance.accounts' => ['name' => 'Contas financeiras', 'description' => 'Gestão das contas financeiras da área e das igrejas.', 'category' => 'Financeiro'],
+            'finance.categories' => ['name' => 'Categorias financeiras', 'description' => 'Gestão das categorias de entrada e saída.', 'category' => 'Financeiro'],
+            'finance.reports' => ['name' => 'Relatórios financeiros', 'description' => 'Consulta de demonstrativos e exportações financeiras.', 'category' => 'Financeiro'],
         ];
     }
 }

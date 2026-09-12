@@ -14,6 +14,8 @@ Sistema web Laravel para gestão de igrejas, membros, cargos e acesso por permis
 
 Na sidebar, Administração contém **Usuários**, **Cargos e permissões** e **Departamentos**. Consulte [contexto de implementação](docs/genesis-implementation-context.md), [modelo de domínio](docs/genesis-domain-model.mmd), [plano de migrations](docs/migration-plan.md) e [identidade visual](docs/visual-identity.md).
 
+A fundação do módulo Financeiro está documentada separadamente em [contexto financeiro](docs/finance/financial-implementation-context.md), [modelo financeiro](docs/finance/financial-domain-model.mmd) e [roadmap financeiro](docs/finance/financial-roadmap.md).
+
 ## Instalação local
 
 Configure `.env`, incluindo as credenciais técnicas:

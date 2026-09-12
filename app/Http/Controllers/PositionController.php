@@ -85,7 +85,7 @@ class PositionController extends Controller
     {
         Gate::authorize('updatePermissions', $position);
         $position->load('permissions');
-        $modules = PermissionModule::query()->where('status', Status::Active->value)->orderByRaw("CASE category WHEN 'Principal' THEN 1 WHEN 'Cadastros' THEN 2 WHEN 'Administração' THEN 3 ELSE 4 END")->orderBy('name')->get()->groupBy('category');
+        $modules = PermissionModule::query()->where('status', Status::Active->value)->orderByRaw("CASE category WHEN 'Principal' THEN 1 WHEN 'Cadastros' THEN 2 WHEN 'Administração' THEN 3 WHEN 'Financeiro' THEN 4 ELSE 5 END")->orderBy('name')->get()->groupBy('category');
 
         return view('positions.permissions', [
             'position' => $position,

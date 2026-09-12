@@ -19,6 +19,8 @@ O projeto não possui dados legados a preservar. Após confirmação explícita,
 13. `member_position_assignments`;
 14. `position_permissions`;
 15. `audit_logs`.
+16. `financial_accounts`, com proprietário exclusivo entre área e igreja;
+17. `financial_categories`, pertencentes à área.
 
 ## Integridade
 
@@ -28,6 +30,7 @@ O projeto não possui dados legados a preservar. Após confirmação explícita,
 - Vínculos de igreja e atribuições de cargo possuem índices parciais para impedir duplicidades ativas e constraints de datas.
 - Relações históricas usam exclusão restrita. Somente linhas técnicas de permissão usam cascade a partir do cargo ou módulo.
 - A matriz garante uma linha por combinação de cargo e módulo.
+- Contas financeiras possuem constraint XOR de proprietário e índices funcionais de nome por área ou igreja; categorias possuem unicidade funcional por área, tipo e nome.
 
 O rollback de validação ocorre na ordem inversa: auditoria, matriz, atribuições, cargos, departamentos, vínculos, igrejas e restrição singleton. A suíte executa migrations em banco PostgreSQL de teste limpo.
 

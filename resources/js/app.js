@@ -5,3 +5,4 @@ import './organization';
 import './members';
 import './position-department';
 import './uppercase-inputs';
+import './financial-owner';

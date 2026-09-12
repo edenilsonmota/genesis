@@ -7,10 +7,14 @@
     $canViewUsers = auth()->user()->can('viewAny', App\Models\User::class);
     $canViewPositions = auth()->user()->can('viewAny', App\Models\Position::class);
     $canViewDepartments = auth()->user()->can('viewAny', App\Models\Department::class);
+    $canViewFinancialAccounts = auth()->user()->can('viewAny', App\Models\FinancialAccount::class);
+    $canViewFinancialCategories = auth()->user()->can('viewAny', App\Models\FinancialCategory::class);
     $registrationsActive = request()->routeIs('organization.*') || request()->routeIs('members.*');
     $administrationActive = request()->routeIs('users.*') || request()->routeIs('positions.*') || request()->routeIs('departments.*');
+    $financeActive = request()->routeIs('finance.*');
     $registrationsId = 'sidebar-registrations-'.$context;
     $administrationId = 'sidebar-administration-'.$context;
+    $financeId = 'sidebar-finance-'.$context;
 @endphp
 
 <div class="grid gap-1" data-sidebar-links data-sidebar-context="{{ $context }}">
@@ -68,6 +72,21 @@
                     <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h3v3H8zM13 9h3M13 12h3M8 15h8" /></svg><span data-sidebar-text>Departamentos</span>
                 </a>
             @endif
+        </div>
+    @endif
+
+    @if ($canViewFinancialAccounts || $canViewFinancialCategories)
+        <div class="relative mt-6">
+            <button class="sidebar-category-toggle" type="button" data-sidebar-category-toggle data-sidebar-category="finance" data-sidebar-context="{{ $context }}" aria-controls="{{ $financeId }}" aria-expanded="{{ $financeActive ? 'true' : 'false' }}">
+                <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7.5h16v11H4zM7 5h10v2.5M4 11h16M8 15h3" /></svg>
+                <span class="min-w-0 flex-1 font-semibold tracking-wide uppercase" data-sidebar-text>Financeiro</span>
+                <svg class="size-3.5 shrink-0 transition-transform" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" data-sidebar-chevron><path d="m5 7.5 5 5 5-5" /></svg>
+            </button>
+        </div>
+        <div class="grid gap-1 overflow-hidden {{ $financeActive ? '' : 'hidden' }}" id="{{ $financeId }}" data-sidebar-category-panel="finance" data-sidebar-category-active="{{ $financeActive ? 'true' : 'false' }}">
+            <a @class(['sidebar-item', 'sidebar-item-active' => $financeActive, 'sidebar-item-idle' => ! $financeActive]) href="{{ $canViewFinancialAccounts ? route('finance.accounts.index') : route('finance.categories.index') }}" data-sidebar-item @if($financeActive) aria-current="page" @endif>
+                <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16v12H4zM8 10h3v4H8zM14 10h3M14 14h3" /></svg><span data-sidebar-text>Contas e categorias</span>
+            </a>
         </div>
     @endif
 </div>

@@ -15,11 +15,14 @@ it('creates the guarded global administrator and modules idempotently', function
 
     expect($user->username)->toBe('genesis.admin')->and($user->member_id)->toBeNull()->and($user->must_change_password)->toBeTrue()
         ->and($user->is_global_administrator)->toBeTrue()->and($user->isGlobalAdministrator())->toBeTrue()
-        ->and(PermissionModule::query()->count())->toBe(8)
+        ->and(PermissionModule::query()->count())->toBe(14)
         ->and(PermissionModule::query()->pluck('category', 'key')->all())->toMatchArray([
             'dashboard' => 'Principal', 'members' => 'Cadastros', 'users' => 'Administração',
             'positions' => 'Administração', 'areas' => 'Cadastros', 'churches' => 'Cadastros',
             'departments' => 'Administração', 'audit' => 'Administração',
+            'finance.overview' => 'Financeiro', 'finance.transactions' => 'Financeiro',
+            'finance.tithes' => 'Financeiro', 'finance.accounts' => 'Financeiro',
+            'finance.categories' => 'Financeiro', 'finance.reports' => 'Financeiro',
         ])
         ->and(AuditLog::query()->where('action', 'global_administrator.created')->count())->toBe(1);
 });

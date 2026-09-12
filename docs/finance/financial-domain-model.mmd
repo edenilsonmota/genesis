@@ -1,0 +1,35 @@
+flowchart LR
+    subgraph IMPLEMENTADO[Implementado nesta etapa]
+        FINANCIAL_ACCOUNTS["financial_accounts<br/>UUID id<br/>area_id XOR church_id<br/>name · type · institution<br/>description · status"]
+        FINANCIAL_CATEGORIES["financial_categories<br/>UUID id<br/>area_id<br/>name · type · description<br/>fixed · status"]
+    end
+
+    subgraph EXISTENTE[Entidades existentes integradas]
+        AREAS[areas]
+        CHURCHES[churches]
+        USERS[users]
+        MEMBERS[members]
+        DEPARTMENTS[departments]
+    end
+
+    subgraph PLANEJADO[Planejado — ainda não implementado]
+        FINANCIAL_TRANSACTIONS["financial_transactions<br/>entrada · despesa · transferência<br/>estado · competência · responsável"]
+        FINANCIAL_MOVEMENTS["financial_movements<br/>débitos e créditos confirmados<br/>base do saldo calculado"]
+        FINANCIAL_ATTACHMENTS["financial_attachments<br/>comprovantes e documentos"]
+    end
+
+    AREAS -->|possui| FINANCIAL_ACCOUNTS
+    CHURCHES -->|possui| FINANCIAL_ACCOUNTS
+    AREAS -->|cataloga| FINANCIAL_CATEGORIES
+    FINANCIAL_TRANSACTIONS -.->|classifica| FINANCIAL_CATEGORIES
+    FINANCIAL_TRANSACTIONS -.->|gera| FINANCIAL_MOVEMENTS
+    FINANCIAL_MOVEMENTS -.->|afeta| FINANCIAL_ACCOUNTS
+    FINANCIAL_TRANSACTIONS -.->|pode identificar contribuinte| MEMBERS
+    FINANCIAL_TRANSACTIONS -.->|pode classificar gestão| DEPARTMENTS
+    USERS -.->|registra e responde por| FINANCIAL_TRANSACTIONS
+    FINANCIAL_TRANSACTIONS -.->|possui| FINANCIAL_ATTACHMENTS
+
+    class FINANCIAL_ACCOUNTS,FINANCIAL_CATEGORIES implemented;
+    class FINANCIAL_TRANSACTIONS,FINANCIAL_MOVEMENTS,FINANCIAL_ATTACHMENTS planned;
+    classDef implemented stroke-width:3px;
+    classDef planned stroke-dasharray:6 4;

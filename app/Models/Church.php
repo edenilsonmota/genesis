@@ -47,6 +47,11 @@ class Church extends Model
         return $this->hasMany(MemberChurchMembership::class);
     }
 
+    public function financialAccounts(): HasMany
+    {
+        return $this->hasMany(FinancialAccount::class);
+    }
+
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(Member::class, 'member_church_memberships')

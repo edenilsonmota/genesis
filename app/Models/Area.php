@@ -33,6 +33,16 @@ class Area extends Model
         return $this->hasMany(Position::class);
     }
 
+    public function financialAccounts(): HasMany
+    {
+        return $this->hasMany(FinancialAccount::class);
+    }
+
+    public function financialCategories(): HasMany
+    {
+        return $this->hasMany(FinancialCategory::class);
+    }
+
     protected function name(): Attribute
     {
         return Attribute::make(
