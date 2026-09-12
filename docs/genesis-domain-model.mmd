@@ -1,0 +1,226 @@
+erDiagram
+    STATES ||--o{ CITIES : possui
+    CITIES ||--o{ CHURCHES : localiza
+    CITIES ||--o{ MEMBERS : endereco
+    AREAS ||--o{ CHURCHES : agrupa
+    AREAS o|--o{ POSITIONS : cataloga
+    AREAS o|--o{ ACCESS_ROLES : cataloga
+    CHURCHES ||--o{ DEPARTMENTS : possui
+
+    MEMBERS ||--o{ MEMBER_CHURCH_MEMBERSHIPS : participa
+    CHURCHES ||--o{ MEMBER_CHURCH_MEMBERSHIPS : recebe
+    MEMBER_CHURCH_MEMBERSHIPS ||--o{ MEMBER_POSITION_ASSIGNMENTS : exerce
+    POSITIONS ||--o{ MEMBER_POSITION_ASSIGNMENTS : define
+    DEPARTMENTS o|--o{ MEMBER_POSITION_ASSIGNMENTS : contextualiza
+
+    MEMBERS o|--o| USERS : possui_credencial
+    USERS ||--o{ USER_GLOBAL_ACCESS_ROLES : recebe
+    USERS ||--o{ USER_AREA_ACCESS_ROLES : recebe
+    USERS ||--o{ USER_CHURCH_ACCESS_ROLES : recebe
+    ACCESS_ROLES ||--o{ USER_GLOBAL_ACCESS_ROLES : atribui
+    ACCESS_ROLES ||--o{ USER_AREA_ACCESS_ROLES : atribui
+    ACCESS_ROLES ||--o{ USER_CHURCH_ACCESS_ROLES : atribui
+    AREAS ||--o{ USER_AREA_ACCESS_ROLES : delimita
+    CHURCHES ||--o{ USER_CHURCH_ACCESS_ROLES : delimita
+    DEPARTMENTS o|--o{ USER_CHURCH_ACCESS_ROLES : restringe
+
+    ACCESS_ROLES ||--o{ ACCESS_ROLE_PERMISSIONS : concede
+    PERMISSION_MODULES ||--o{ ACCESS_ROLE_PERMISSIONS : configura
+
+    STATES {
+        integer id PK
+        varchar abbreviation UK
+        varchar name
+    }
+
+    CITIES {
+        integer id PK
+        integer state_id FK
+        varchar name
+    }
+
+    AREAS {
+        uuid id PK
+        varchar name UK
+        varchar description
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CHURCHES {
+        uuid id PK
+        uuid area_id FK
+        integer city_id FK
+        varchar name
+        varchar postal_code
+        varchar street
+        varchar neighborhood
+        varchar number
+        varchar complement
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    DEPARTMENTS {
+        uuid id PK
+        uuid church_id FK
+        varchar name
+        varchar description
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    MEMBERS {
+        uuid id PK
+        varchar name
+        varchar cpf UK
+        varchar email
+        varchar phone
+        date birth_date
+        enum sex
+        varchar postal_code
+        varchar street
+        varchar number
+        varchar complement
+        varchar neighborhood
+        integer city_id FK
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    MEMBER_CHURCH_MEMBERSHIPS {
+        uuid id PK
+        uuid member_id FK
+        uuid church_id FK
+        enum status
+        boolean is_primary
+        date joined_at
+        date ended_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    POSITIONS {
+        uuid id PK
+        uuid area_id FK
+        varchar name
+        varchar description
+        boolean fixed
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    MEMBER_POSITION_ASSIGNMENTS {
+        uuid id PK
+        uuid member_church_membership_id FK
+        uuid position_id FK
+        uuid department_id FK
+        enum status
+        date started_at
+        date ended_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USERS {
+        uuid id PK
+        uuid member_id FK,UK
+        varchar display_name
+        varchar username UK
+        varchar password
+        varchar remember_token
+        enum status
+        boolean must_change_password
+        timestamp last_login_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ACCESS_ROLES {
+        uuid id PK
+        uuid area_id FK
+        varchar name
+        varchar description
+        boolean fixed
+        boolean is_administrator
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    PERMISSION_MODULES {
+        uuid id PK
+        varchar key UK
+        varchar name
+        varchar description
+        varchar category
+        enum status
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ACCESS_ROLE_PERMISSIONS {
+        uuid id PK
+        uuid access_role_id FK
+        uuid permission_module_id FK
+        enum level
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USER_GLOBAL_ACCESS_ROLES {
+        uuid id PK
+        uuid user_id FK
+        uuid access_role_id FK
+        enum status
+        date started_at
+        date ended_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USER_AREA_ACCESS_ROLES {
+        uuid id PK
+        uuid user_id FK
+        uuid area_id FK
+        uuid access_role_id FK
+        enum status
+        date started_at
+        date ended_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    USER_CHURCH_ACCESS_ROLES {
+        uuid id PK
+        uuid user_id FK
+        uuid church_id FK
+        uuid access_role_id FK
+        uuid department_id FK
+        enum status
+        date started_at
+        date ended_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    AUDIT_LOGS {
+        uuid id PK
+        uuid actor_user_id
+        varchar actor_name
+        varchar actor_username
+        varchar action
+        varchar resource
+        varchar route
+        varchar record_id
+        varchar scope_type
+        uuid scope_id
+        varchar ip_address
+        jsonb details
+        timestamp created_at
+    }

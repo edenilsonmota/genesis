@@ -1,0 +1,60 @@
+<?php
+
+use App\Models\AccessRole;
+use App\Models\AccessRolePermission;
+use App\Models\PermissionModule;
+use App\Models\User;
+use App\Models\UserGlobalAccessRole;
+use Database\Seeders\GenesisAdminSeeder;
+use Illuminate\Support\Facades\Hash;
+
+it('creates the global administrator and its access records idempotently', function () {
+    config()->set('genesis.admin', [
+        'name' => 'Genesis Administrator',
+        'username' => '  GENESIS.ADMIN  ',
+        'password' => 'InitialPassword123',
+    ]);
+
+    $this->seed(GenesisAdminSeeder::class);
+    $this->seed(GenesisAdminSeeder::class);
+
+    $user = User::query()->sole();
+
+    expect($user->username)->toBe('genesis.admin')
+        ->and($user->member_id)->toBeNull()
+        ->and($user->must_change_password)->toBeTrue()
+        ->and(PermissionModule::query()->count())->toBe(9)
+        ->and(AccessRole::query()->count())->toBe(1)
+        ->and(AccessRolePermission::query()->count())->toBe(9)
+        ->and(UserGlobalAccessRole::query()->count())->toBe(1)
+        ->and($user->isGlobalAdministrator())->toBeTrue();
+});
+
+it('stores the configured administrator password only as a hash', function () {
+    config()->set('genesis.admin', [
+        'name' => 'Genesis Administrator',
+        'username' => 'genesis.admin',
+        'password' => 'InitialPassword123',
+    ]);
+
+    $this->seed(GenesisAdminSeeder::class);
+
+    $storedPassword = User::query()->sole()->password;
+
+    expect($storedPassword)
+        ->not->toBe('InitialPassword123')
+        ->and(Hash::check('InitialPassword123', $storedPassword))->toBeTrue();
+});
+
+it('rejects missing administrator environment configuration before writing data', function () {
+    config()->set('genesis.admin', [
+        'name' => null,
+        'username' => null,
+        'password' => null,
+    ]);
+
+    expect(fn () => $this->seed(GenesisAdminSeeder::class))
+        ->toThrow(LogicException::class);
+    expect(User::query()->count())->toBe(0)
+        ->and(PermissionModule::query()->count())->toBe(0);
+});

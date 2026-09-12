@@ -2,20 +2,75 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Status;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable([
+    'member_id',
+    'display_name',
+    'username',
+    'password',
+    'status',
+    'must_change_password',
+    'last_login_at',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasUuids, Notifiable;
+
+    public static function normalizeUsername(string $username): string
+    {
+        return Str::of($username)->trim()->lower()->toString();
+    }
+
+    public function member(): BelongsTo
+    {
+        return $this->belongsTo(Member::class);
+    }
+
+    public function globalAccessRoles(): HasMany
+    {
+        return $this->hasMany(UserGlobalAccessRole::class);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === Status::Active;
+    }
+
+    public function isGlobalAdministrator(): bool
+    {
+        return $this->globalAccessRoles()
+            ->effective()
+            ->whereHas('accessRole', function (Builder $query): void {
+                $query
+                    ->whereNull('area_id')
+                    ->where('fixed', true)
+                    ->where('is_administrator', true)
+                    ->where('status', Status::Active->value);
+            })
+            ->exists();
+    }
+
+    protected function username(): Attribute
+    {
+        return Attribute::make(
+            set: fn (mixed $value): string => self::normalizeUsername((string) $value),
+        );
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -25,8 +80,10 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => Status::class,
+            'must_change_password' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 }
