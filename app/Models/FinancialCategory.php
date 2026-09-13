@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 #[Fillable(['area_id', 'name', 'type', 'description', 'fixed', 'status'])]
@@ -24,6 +25,11 @@ class FinancialCategory extends Model
     public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(FinancialTransaction::class, 'category_id');
     }
 
     #[Scope]

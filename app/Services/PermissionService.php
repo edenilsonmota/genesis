@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Church;
+use App\Models\FinancialAccount;
 use App\Models\PermissionModule;
 use App\Models\User;
 use App\PermissionLevel;
@@ -109,6 +110,37 @@ class PermissionService
     {
         return $user->isGlobalAdministrator()
             || ($user->isActive() && $this->availableChurchesQuery($user)->whereKey($church->id)->exists());
+    }
+
+    /** @return Collection<int, Church> */
+    public function churchesWithPermission(User $user, string $moduleKey, PermissionLevel $level): Collection
+    {
+        return $this->availableChurches($user)
+            ->filter(fn (Church $church): bool => $this->can($user, $moduleKey, $level, $church))
+            ->values();
+    }
+
+    public function canUseFinancialAccount(
+        User $user,
+        FinancialAccount $financialAccount,
+        string $moduleKey,
+        PermissionLevel $level,
+    ): bool {
+        if ($user->isGlobalAdministrator()) {
+            return true;
+        }
+
+        if ($financialAccount->area_id !== null || $financialAccount->church_id === null) {
+            return false;
+        }
+
+        $church = $financialAccount->relationLoaded('church')
+            ? $financialAccount->church
+            : Church::query()->find($financialAccount->church_id);
+
+        return $church !== null
+            && $this->canAccessChurch($user, $church)
+            && $this->can($user, $moduleKey, $level, $church);
     }
 
     public function constrainUsersToChurch(Builder $query, Church $church): Builder

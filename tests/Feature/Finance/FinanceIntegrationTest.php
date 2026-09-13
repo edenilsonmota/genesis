@@ -62,11 +62,12 @@ it('hides the finance sidebar from users without either implemented permission',
         ->assertDontSee('Contas e categorias');
 });
 
-it('does not expose deletion or future finance routes', function () {
+it('exposes movements without deletion and keeps future finance routes private', function () {
     expect(Route::has('finance.accounts.destroy'))->toBeFalse()
         ->and(Route::has('finance.categories.destroy'))->toBeFalse()
         ->and(Route::has('finance.overview.index'))->toBeFalse()
-        ->and(Route::has('finance.transactions.index'))->toBeFalse()
+        ->and(Route::has('finance.transactions.index'))->toBeTrue()
+        ->and(Route::has('finance.transactions.destroy'))->toBeFalse()
         ->and(Route::has('finance.tithes.index'))->toBeFalse()
         ->and(Route::has('finance.reports.index'))->toBeFalse();
 });

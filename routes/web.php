@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\Finance\FinancialAccountController;
 use App\Http\Controllers\Finance\FinancialCategoryController;
+use App\Http\Controllers\Finance\FinancialTransactionController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MemberMembershipController;
 use App\Http\Controllers\MemberPositionAssignmentController;
@@ -59,6 +60,20 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
         Route::put('/positions/{position}/permissions', [PositionController::class, 'updatePermissions'])->name('positions.permissions.update');
 
         Route::prefix('finance')->name('finance.')->group(function (): void {
+            Route::prefix('transactions')->name('transactions.')->group(function (): void {
+                Route::get('/', [FinancialTransactionController::class, 'index'])->name('index');
+                Route::get('/create', [FinancialTransactionController::class, 'create'])->name('create');
+                Route::post('/income', [FinancialTransactionController::class, 'storeIncome'])->name('income.store');
+                Route::post('/expenses', [FinancialTransactionController::class, 'storeExpense'])->name('expenses.store');
+                Route::post('/transfers', [FinancialTransactionController::class, 'storeTransfer'])->name('transfers.store');
+                Route::get('/{financialTransaction}', [FinancialTransactionController::class, 'show'])->name('show');
+                Route::get('/{financialTransaction}/edit', [FinancialTransactionController::class, 'edit'])->name('edit');
+                Route::put('/{financialTransaction}', [FinancialTransactionController::class, 'update'])->name('update');
+                Route::patch('/{financialTransaction}/settle', [FinancialTransactionController::class, 'settle'])->name('settle');
+                Route::patch('/{financialTransaction}/cancel', [FinancialTransactionController::class, 'cancel'])->name('cancel');
+                Route::post('/{financialTransaction}/reverse', [FinancialTransactionController::class, 'reverse'])->name('reverse');
+            });
+
             Route::prefix('accounts')->name('accounts.')->group(function (): void {
                 Route::get('/', [FinancialAccountController::class, 'index'])->name('index');
                 Route::get('/create', [FinancialAccountController::class, 'create'])->name('create');

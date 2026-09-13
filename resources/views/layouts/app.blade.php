@@ -68,6 +68,15 @@
                     </div>
                 @endif
 
+                @if (session('warning'))
+                    <div class="mb-6 flex items-start justify-between gap-4 rounded-2xl border border-warning/20 bg-warning-soft px-4 py-3 text-sm text-warning" role="status">
+                        <p>{{ session('warning') }}</p>
+                        <button class="rounded-md p-1 hover:bg-warning/10" type="button" data-flash-dismiss aria-label="Fechar aviso">
+                            <svg class="size-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" /></svg>
+                        </button>
+                    </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>

@@ -6,3 +6,4 @@ import './members';
 import './position-department';
 import './uppercase-inputs';
 import './financial-owner';
+import './financial-transactions';
