@@ -48,6 +48,10 @@ class PositionController extends Controller
     {
         $position = $service->create($request->validated());
 
+        if ($position->grants_system_access) {
+            return redirect()->route('positions.permissions', $position)->with('success', 'Cargo criado. Defina as permissões de acesso.');
+        }
+
         return redirect()->route('positions.edit', $position)->with('success', 'Cargo criado com sucesso.');
     }
 

@@ -34,16 +34,29 @@ it('creates and edits a position in the singleton area with an optional active d
     $area = Area::factory()->create();
     $department = Department::factory()->for($area)->create();
 
-    $this->actingAs($administrator)->post(route('positions.store'), [
+    $response = $this->actingAs($administrator)->post(route('positions.store'), [
         'name' => 'Coordenador', 'description' => 'Coordena equipes.', 'department_id' => $department->id, 'grants_system_access' => '1',
-    ])->assertRedirect();
+    ]);
     $position = Position::query()->sole();
+    $response->assertRedirect(route('positions.permissions', $position));
     expect($position->area_id)->toBe($area->id)->and($position->grants_system_access)->toBeTrue();
 
     $this->actingAs($administrator)->put(route('positions.update', $position), [
         'name' => 'Coordenador geral', 'description' => null, 'department_id' => '', 'grants_system_access' => '1',
     ])->assertRedirect(route('positions.index'));
     expect($position->refresh()->name)->toBe('COORDENADOR GERAL')->and($position->department_id)->toBeNull();
+});
+
+it('redirects organizational positions to their edit screen after creation', function () {
+    $administrator = User::factory()->globalAdministrator()->create();
+    Area::factory()->create();
+
+    $response = $this->actingAs($administrator)->post(route('positions.store'), [
+        'name' => 'Recepcionista',
+    ]);
+    $position = Position::query()->sole();
+
+    $response->assertRedirect(route('positions.edit', $position));
 });
 
 it('enforces case-insensitive position uniqueness within area and department', function () {

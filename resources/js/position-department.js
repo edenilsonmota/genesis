@@ -48,8 +48,15 @@ if (select) {
     };
 
     select.addEventListener('search', (event) => {
-        searchTerm = event.detail.value.trim();
+        searchTerm = event.detail.value.trim().toLocaleUpperCase('pt-BR');
         searchHasNoResults = event.detail.resultCount === 0;
+
+        const searchInput = select.parentElement?.querySelector('.choices__input--cloned');
+
+        if (searchInput && searchInput.value !== searchTerm) {
+            searchInput.value = searchTerm;
+        }
+
         syncTrigger();
     });
     select.addEventListener('choice', () => {
