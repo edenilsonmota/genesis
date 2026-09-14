@@ -32,14 +32,14 @@ class StoreChurchRequest extends FormRequest
         return [
             'area_id' => ['prohibited'],
             'name' => ['required', 'string', 'max:255'],
-            'postal_code' => ['required', 'digits:8'],
-            'state_id' => ['required', 'integer', 'exists:states,id'],
-            'city_id' => ['required', 'integer', 'exists:cities,id'],
-            'street' => ['required', 'string', 'max:255'],
-            'neighborhood' => ['required', 'string', 'max:255'],
-            'number' => ['required', 'string', 'max:30'],
+            'postal_code' => ['nullable', 'digits:8'],
+            'state_id' => ['nullable', 'integer', 'exists:states,id'],
+            'city_id' => ['nullable', 'integer', 'exists:cities,id'],
+            'street' => ['nullable', 'string', 'max:255'],
+            'neighborhood' => ['nullable', 'string', 'max:255'],
+            'number' => ['nullable', 'string', 'max:30'],
             'complement' => ['nullable', 'string', 'max:255'],
-            'status' => ['required', Rule::in([Status::Active->value, Status::Inactive->value])],
+            'status' => ['nullable', Rule::in([Status::Active->value, Status::Inactive->value])],
         ];
     }
 
@@ -47,7 +47,13 @@ class StoreChurchRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                if (! $validator->errors()->hasAny(['state_id', 'city_id'])) {
+                $hasState = filled($this->input('state_id'));
+                $hasCity = filled($this->input('city_id'));
+                if ($hasState xor $hasCity) {
+                    $validator->errors()->add($hasState ? 'city_id' : 'state_id', 'Estado e cidade devem ser informados juntos.');
+                }
+
+                if ($hasState && $hasCity && ! $validator->errors()->hasAny(['state_id', 'city_id'])) {
                     $cityBelongsToState = City::query()
                         ->whereKey($this->integer('city_id'))
                         ->where('state_id', $this->integer('state_id'))
@@ -82,11 +88,14 @@ class StoreChurchRequest extends FormRequest
 
         $this->merge([
             'name' => Str::squish($this->string('name')->toString()),
-            'postal_code' => preg_replace('/\D/', '', $this->string('postal_code')->toString()),
-            'street' => Str::squish($this->string('street')->toString()),
-            'neighborhood' => Str::squish($this->string('neighborhood')->toString()),
-            'number' => Str::squish($this->string('number')->toString()),
+            'postal_code' => filled($this->input('postal_code')) ? preg_replace('/\D/', '', $this->string('postal_code')->toString()) : null,
+            'state_id' => filled($this->input('state_id')) ? $this->input('state_id') : null,
+            'city_id' => filled($this->input('city_id')) ? $this->input('city_id') : null,
+            'street' => filled($this->input('street')) ? Str::squish($this->string('street')->toString()) : null,
+            'neighborhood' => filled($this->input('neighborhood')) ? Str::squish($this->string('neighborhood')->toString()) : null,
+            'number' => filled($this->input('number')) ? Str::squish($this->string('number')->toString()) : null,
             'complement' => $complement ?: null,
+            'status' => $this->input('status', Status::Active->value),
         ]);
     }
 }

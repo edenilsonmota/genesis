@@ -71,22 +71,40 @@ it('does not create a church without an area when the service is called directly
         ->toThrow(ValidationException::class);
 });
 
-it('validates all required church fields', function () {
+it('requires only the church name', function () {
     Area::factory()->create();
     $administrator = User::factory()->globalAdministrator()->create();
 
     $response = $this->actingAs($administrator)->post(route('organization.churches.store'), []);
 
-    $response->assertSessionHasErrors([
-        'name',
-        'postal_code',
-        'state_id',
-        'city_id',
-        'street',
-        'neighborhood',
-        'number',
-        'status',
+    $response->assertSessionHasErrors('name');
+});
+
+it('creates a church with only its name and defaults it to active', function () {
+    $area = Area::factory()->create();
+    $administrator = User::factory()->globalAdministrator()->create();
+
+    $this->actingAs($administrator)->post(route('organization.churches.store'), ['name' => 'Igreja sem endereço'])
+        ->assertRedirect(route('organization.index'));
+
+    $this->assertDatabaseHas('churches', [
+        'area_id' => $area->id,
+        'name' => 'Igreja sem endereço',
+        'status' => Status::Active->value,
+        'city_id' => null,
+        'postal_code' => null,
     ]);
+});
+
+it('requires state and city together when an address location is informed', function () {
+    Area::factory()->create();
+    $state = State::factory()->create();
+    $administrator = User::factory()->globalAdministrator()->create();
+
+    $this->actingAs($administrator)->post(route('organization.churches.store'), [
+        'name' => 'Igreja parcial',
+        'state_id' => $state->id,
+    ])->assertSessionHasErrors('city_id');
 });
 
 it('rejects a city that does not belong to the selected state', function () {

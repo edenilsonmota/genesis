@@ -75,7 +75,7 @@ class Church extends Model
     protected function postalCode(): Attribute
     {
         return Attribute::make(
-            set: fn (mixed $value): string => preg_replace('/\D/', '', (string) $value) ?? '',
+            set: fn (mixed $value): ?string => filled($value) ? preg_replace('/\D/', '', (string) $value) : null,
         );
     }
 

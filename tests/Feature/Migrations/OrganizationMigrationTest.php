@@ -20,6 +20,7 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         '2026_09_13_000121_create_financial_movements_table.php',
         '2026_09_14_000215_add_default_marker_to_financial_accounts_table.php',
         '2026_09_14_002304_seed_default_financial_categories_for_existing_areas.php',
+        '2026_09_14_005604_make_church_details_optional.php',
     ];
     $migrations = collect($files)->map(fn (string $file) => require database_path('migrations/'.$file));
 

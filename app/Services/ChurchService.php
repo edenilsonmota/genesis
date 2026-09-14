@@ -18,7 +18,7 @@ class ChurchService
     ) {}
 
     /**
-     * @param  array{city_id: int, name: string, postal_code: string, street: string, neighborhood: string, number: string, complement: ?string, status: string}  $attributes
+     * @param  array{city_id: ?int, name: string, postal_code: ?string, street: ?string, neighborhood: ?string, number: ?string, complement: ?string, status: string}  $attributes
      */
     public function create(array $attributes): Church
     {
@@ -46,7 +46,7 @@ class ChurchService
     }
 
     /**
-     * @param  array{city_id: int, name: string, postal_code: string, street: string, neighborhood: string, number: string, complement: ?string, status: string}  $attributes
+     * @param  array{city_id: ?int, name: string, postal_code: ?string, street: ?string, neighborhood: ?string, number: ?string, complement: ?string, status: string}  $attributes
      */
     public function update(Church $church, array $attributes): Church
     {

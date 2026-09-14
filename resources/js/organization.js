@@ -8,7 +8,7 @@ document.querySelectorAll('[data-dependent-cities]').forEach((container) => {
     }
 
     const loadCities = async (stateId, selectedCityId = '') => {
-        const emptyLabel = citySelect.required ? 'Selecione' : 'Todas';
+        const emptyLabel = 'Selecione';
 
         citySelect.replaceChildren(new Option(stateId ? 'Carregando…' : 'Escolha um estado primeiro', ''));
         citySelect.disabled = true;
