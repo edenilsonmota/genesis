@@ -17,6 +17,10 @@ use Illuminate\Support\Str;
 #[Fillable([
     'member_id',
     'display_name',
+    'cpf',
+    'email',
+    'phone',
+    'profile_photo_path',
     'username',
     'password',
     'status',
@@ -53,6 +57,27 @@ class User extends Authenticatable
     {
         return Attribute::make(
             set: fn (mixed $value): string => self::normalizeUsername((string) $value),
+        );
+    }
+
+    protected function cpf(): Attribute
+    {
+        return Attribute::make(
+            set: fn (mixed $value): ?string => ($cpf = preg_replace('/\D/', '', (string) $value) ?? '') !== '' ? $cpf : null,
+        );
+    }
+
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (mixed $value): ?string => ($email = Str::lower(trim((string) $value))) !== '' ? $email : null,
+        );
+    }
+
+    protected function phone(): Attribute
+    {
+        return Attribute::make(
+            set: fn (mixed $value): ?string => ($phone = preg_replace('/\D/', '', (string) $value) ?? '') !== '' ? $phone : null,
         );
     }
 

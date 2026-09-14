@@ -46,13 +46,24 @@
                         @elseif (auth()->user()->isGlobalAdministrator())
                             <span class="hidden text-xs font-semibold text-text-secondary md:inline">Escopo global</span>
                         @endif
-                        <div class="hidden items-center gap-2.5 rounded-full border border-border-default bg-surface-card px-2.5 py-1.5 sm:flex">
-                            <span class="grid size-7 shrink-0 place-items-center rounded-full bg-brand-primary-soft text-xs font-semibold text-brand-primary" aria-hidden="true">{{ str(auth()->user()->display_name)->substr(0, 1)->upper() }}</span>
+                        <a class="hidden items-center gap-2.5 rounded-full border border-border-default bg-surface-card px-2.5 py-1.5 transition hover:border-brand-sky hover:bg-surface-muted sm:flex" href="{{ route('profile.edit') }}" aria-label="Abrir meu perfil">
+                            @if (auth()->user()->profile_photo_path)
+                                <img class="size-7 shrink-0 rounded-full object-cover" src="{{ asset('storage/'.auth()->user()->profile_photo_path) }}" alt="">
+                            @else
+                                <span class="grid size-7 shrink-0 place-items-center rounded-full bg-brand-primary-soft text-xs font-semibold text-brand-primary" aria-hidden="true">{{ str(auth()->user()->display_name)->substr(0, 1)->upper() }}</span>
+                            @endif
                             <div class="min-w-0 pr-1">
                                 <p class="max-w-40 truncate text-xs font-semibold text-text-primary">{{ auth()->user()->display_name }}</p>
                                 <p class="max-w-40 truncate text-[11px] text-text-secondary">{{ '@'.auth()->user()->username }}</p>
                             </div>
-                        </div>
+                        </a>
+                        <a class="grid size-9 place-items-center rounded-full border border-border-default bg-surface-card sm:hidden" href="{{ route('profile.edit') }}" aria-label="Abrir meu perfil">
+                            @if (auth()->user()->profile_photo_path)
+                                <img class="size-7 rounded-full object-cover" src="{{ asset('storage/'.auth()->user()->profile_photo_path) }}" alt="">
+                            @else
+                                <span class="grid size-7 place-items-center rounded-full bg-brand-primary-soft text-xs font-semibold text-brand-primary" aria-hidden="true">{{ str(auth()->user()->display_name)->substr(0, 1)->upper() }}</span>
+                            @endif
+                        </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button class="ui-button-outline px-3 py-2 text-xs" type="submit">Sair</button>

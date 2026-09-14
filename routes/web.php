@@ -14,6 +14,7 @@ use App\Http\Controllers\MemberPositionAssignmentController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\PostalCodeController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StateCityController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,13 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
     Route::middleware('password.changed')->group(function (): void {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
         Route::patch('/active-church', [ActiveChurchController::class, 'update'])->name('active-church.update');
+
+        Route::prefix('perfil')->name('profile.')->group(function (): void {
+            Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+            Route::patch('/', [ProfileController::class, 'updateDetails'])->name('details.update');
+            Route::patch('/usuario', [ProfileController::class, 'updateUsername'])->name('username.update');
+            Route::put('/senha', [ProfileController::class, 'updatePassword'])->name('password.update');
+        });
 
         Route::resource('members', MemberController::class)
             ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
