@@ -18,10 +18,8 @@ it('seeds every financial permission module idempotently', function () {
         'finance.overview' => 'Financeiro',
         'finance.transactions' => 'Financeiro',
         'finance.tithes' => 'Financeiro',
-        'finance.accounts' => 'Financeiro',
-        'finance.categories' => 'Financeiro',
         'finance.reports' => 'Financeiro',
-    ])->and($financialModules)->toHaveCount(6);
+    ])->and($financialModules)->toHaveCount(4);
 });
 
 it('shows financial capabilities in the position permission matrix', function () {
@@ -33,22 +31,19 @@ it('shows financial capabilities in the position permission matrix', function ()
     $this->actingAs($administrator)->get(route('positions.permissions', $position))
         ->assertOk()
         ->assertSee('Financeiro')
-        ->assertSee('Contas financeiras')
-        ->assertSee('Categorias financeiras')
         ->assertSee('Visão financeira')
         ->assertSee('Dízimos');
 });
 
-it('shows only the implemented finance sidebar item when either read permission is available', function () {
-    $categoryReader = userWithPermission('finance.categories', PermissionLevel::Read);
+it('shows only the movements item when its read permission is available', function () {
+    $transactionReader = userWithPermission('finance.transactions', PermissionLevel::Read);
 
-    $this->actingAs($categoryReader)->get(route('finance.categories.index'))
+    $this->actingAs($transactionReader)->get(route('finance.transactions.index'))
         ->assertOk()
         ->assertSee('Financeiro')
-        ->assertSee('Contas e categorias')
-        ->assertSee('href="'.route('finance.categories.index').'"', false)
+        ->assertSee('Movimentações')
+        ->assertSee('href="'.route('finance.transactions.index').'"', false)
         ->assertDontSee('Visão financeira')
-        ->assertDontSee('Movimentações')
         ->assertDontSee('Dízimos')
         ->assertDontSee('Relatórios');
 });
@@ -59,12 +54,12 @@ it('hides the finance sidebar from users without either implemented permission',
     $this->actingAs($dashboardUser)->get(route('dashboard'))
         ->assertOk()
         ->assertDontSee('Financeiro')
-        ->assertDontSee('Contas e categorias');
+        ->assertDontSee('Movimentações');
 });
 
 it('exposes movements without deletion and keeps future finance routes private', function () {
-    expect(Route::has('finance.accounts.destroy'))->toBeFalse()
-        ->and(Route::has('finance.categories.destroy'))->toBeFalse()
+    expect(Route::has('finance.accounts.index'))->toBeFalse()
+        ->and(Route::has('finance.categories.index'))->toBeFalse()
         ->and(Route::has('finance.overview.index'))->toBeFalse()
         ->and(Route::has('finance.transactions.index'))->toBeTrue()
         ->and(Route::has('finance.transactions.destroy'))->toBeFalse()

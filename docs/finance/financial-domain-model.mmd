@@ -1,6 +1,6 @@
 flowchart LR
     subgraph IMPLEMENTADO[Implementado nesta etapa]
-        FINANCIAL_ACCOUNTS["financial_accounts<br/>UUID id<br/>area_id XOR church_id<br/>name · type · institution<br/>description · status"]
+        FINANCIAL_ACCOUNTS["financial_accounts<br/>UUID id<br/>area_id XOR church_id<br/>nome · tipo · status<br/>is_default"]
         FINANCIAL_CATEGORIES["financial_categories<br/>UUID id<br/>area_id<br/>name · type · description<br/>fixed · status"]
     end
 
@@ -12,9 +12,12 @@ flowchart LR
         DEPARTMENTS[departments]
     end
 
-    subgraph PLANEJADO[Planejado — ainda não implementado]
+    subgraph IMPLEMENTADO_MOVEMENTS[Implementado nesta etapa]
         FINANCIAL_TRANSACTIONS["financial_transactions<br/>entrada · despesa · transferência<br/>estado · competência · responsável"]
         FINANCIAL_MOVEMENTS["financial_movements<br/>débitos e créditos confirmados<br/>base do saldo calculado"]
+    end
+
+    subgraph PLANEJADO[Planejado — ainda não implementado]
         FINANCIAL_ATTACHMENTS["financial_attachments<br/>comprovantes e documentos"]
     end
 
@@ -29,7 +32,7 @@ flowchart LR
     USERS -.->|registra e responde por| FINANCIAL_TRANSACTIONS
     FINANCIAL_TRANSACTIONS -.->|possui| FINANCIAL_ATTACHMENTS
 
-    class FINANCIAL_ACCOUNTS,FINANCIAL_CATEGORIES implemented;
-    class FINANCIAL_TRANSACTIONS,FINANCIAL_MOVEMENTS,FINANCIAL_ATTACHMENTS planned;
+    class FINANCIAL_ACCOUNTS,FINANCIAL_CATEGORIES,FINANCIAL_TRANSACTIONS,FINANCIAL_MOVEMENTS implemented;
+    class FINANCIAL_ATTACHMENTS planned;
     classDef implemented stroke-width:3px;
     classDef planned stroke-dasharray:6 4;

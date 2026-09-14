@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Area;
 use App\Models\Church;
+use App\Services\Finance\DefaultFinancialAccountService;
 use App\Status;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,10 @@ use Illuminate\Validation\ValidationException;
 
 class ChurchService
 {
-    public function __construct(private AuditService $audit) {}
+    public function __construct(
+        private AuditService $audit,
+        private DefaultFinancialAccountService $defaultFinancialAccounts,
+    ) {}
 
     /**
      * @param  array{city_id: int, name: string, postal_code: string, street: string, neighborhood: string, number: string, complement: ?string, status: string}  $attributes
@@ -29,6 +33,7 @@ class ChurchService
                 }
 
                 $church = $area->churches()->create($attributes);
+                $this->defaultFinancialAccounts->ensureForChurch($church);
                 $this->audit->record('church.created', 'churches', $church, 'church', $church->id, ['name' => $church->name]);
 
                 return $church;

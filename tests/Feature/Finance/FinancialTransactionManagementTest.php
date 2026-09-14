@@ -67,6 +67,35 @@ it('enforces transaction read and write permissions in the backend', function ()
     $this->actingAs($withoutPermission)->get(route('finance.transactions.index'))->assertForbidden();
 });
 
+it('creates a custom category from the movement form in the selected area and type', function () {
+    $context = transactionContext();
+
+    $response = $this->actingAs($context['user'])->postJson(route('finance.transactions.categories.store'), [
+        'name' => 'Contribuição especial',
+        'type' => 'income',
+        'area_id' => $context['area']->id,
+    ]);
+
+    $response->assertCreated()->assertJsonPath('category.name', 'Contribuição especial');
+    $this->assertDatabaseHas('financial_categories', [
+        'area_id' => $context['area']->id,
+        'name' => 'Contribuição especial',
+        'type' => 'income',
+        'fixed' => false,
+    ]);
+    expect(AuditLog::query()->where('action', 'financial_category.created_from_transaction')->exists())->toBeTrue();
+});
+
+it('does not let a transaction reader create categories from the movement form', function () {
+    $context = transactionContext(PermissionLevel::Read);
+
+    $this->actingAs($context['user'])->postJson(route('finance.transactions.categories.store'), [
+        'name' => 'Categoria bloqueada',
+        'type' => 'income',
+        'area_id' => $context['area']->id,
+    ])->assertForbidden();
+});
+
 it('creates a settled income with one inflow and an audit record', function () {
     $context = transactionContext();
 

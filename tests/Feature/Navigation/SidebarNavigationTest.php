@@ -21,8 +21,8 @@ it('shows the implemented categories and routes to a global administrator', func
         ->assertSee('Administração')->assertSee('Usuários')->assertSee('Cargos e permissões')->assertSee('Departamentos')
         ->assertSee('href="'.route('positions.index').'"', false)
         ->assertSee('href="'.route('departments.index').'"', false)
-        ->assertSee('Financeiro')->assertSee('Movimentações')->assertSee('Contas e categorias')
-        ->assertSee('href="'.route('finance.accounts.index').'"', false);
+        ->assertSee('Financeiro')->assertSee('Movimentações')
+        ->assertSee('href="'.route('finance.transactions.index').'"', false);
 });
 
 it('keeps each administration item active only on its own routes', function () {
@@ -38,13 +38,6 @@ it('keeps each administration item active only on its own routes', function () {
 
 it('keeps each finance item active only on its own routes', function () {
     $administrator = User::factory()->globalAdministrator()->create();
-
-    foreach ([route('finance.accounts.index'), route('finance.categories.index')] as $url) {
-        $content = $this->actingAs($administrator)->get($url)->assertOk()->getContent();
-
-        expect($content)->toMatch('/data-sidebar-category="finance"[^>]*aria-expanded="true"/')
-            ->toMatch('/href="'.preg_quote(route('finance.accounts.index'), '/').'"[^>]*aria-current="page"/');
-    }
 
     $content = $this->actingAs($administrator)->get(route('finance.transactions.index'))->assertOk()->getContent();
     expect($content)->toMatch('/data-sidebar-category="finance"[^>]*aria-expanded="true"/')

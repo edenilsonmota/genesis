@@ -47,8 +47,6 @@ Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias
 | Administração | `positions` | Cargos e permissões |
 | Administração | `departments` | Departamentos |
 | Administração | `audit` | Auditoria |
-| Financeiro | `finance.accounts` | Contas financeiras |
-| Financeiro | `finance.categories` | Categorias financeiras |
 
 As capacidades reservadas `finance.overview`, `finance.transactions`, `finance.tithes` e `finance.reports` já fazem parte da matriz, mas não possuem telas ou links nesta etapa. O domínio e a evolução do módulo estão em [`docs/finance`](finance/financial-implementation-context.md).
 

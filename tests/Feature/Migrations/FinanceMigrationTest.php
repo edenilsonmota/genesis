@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 it('creates financial tables with ownership lifecycle and movement constraints', function () {
     expect(Schema::hasColumns('financial_accounts', [
-        'id', 'area_id', 'church_id', 'name', 'type', 'institution', 'description', 'status', 'created_at', 'updated_at',
+        'id', 'area_id', 'church_id', 'name', 'type', 'institution', 'description', 'status', 'is_default', 'created_at', 'updated_at',
     ]))->toBeTrue()
         ->and(Schema::hasColumn('financial_accounts', 'balance'))->toBeFalse()
         ->and(Schema::hasColumn('financial_accounts', 'opening_balance'))->toBeFalse()
@@ -36,9 +36,11 @@ it('creates financial tables with ownership lifecycle and movement constraints',
         ->and(DB::table('pg_indexes')->whereIn('indexname', [
             'financial_accounts_area_name_lower_unique',
             'financial_accounts_church_name_lower_unique',
+            'financial_accounts_area_default_unique',
+            'financial_accounts_church_default_unique',
             'financial_categories_area_type_name_lower_unique',
             'financial_movements_financial_transaction_id_financial_account_id_unique',
-        ])->count())->toBe(4);
+        ])->count())->toBe(6);
 });
 
 it('enforces exactly one financial account owner in PostgreSQL', function () {
@@ -72,6 +74,8 @@ it('rolls back and reapplies the financial migrations', function () {
         '2026_09_12_230821_create_financial_categories_table.php',
         '2026_09_13_000120_create_financial_transactions_table.php',
         '2026_09_13_000121_create_financial_movements_table.php',
+        '2026_09_14_000215_add_default_marker_to_financial_accounts_table.php',
+        '2026_09_14_002304_seed_default_financial_categories_for_existing_areas.php',
     ];
     $migrations = collect($files)->map(fn (string $file) => require database_path('migrations/'.$file));
 

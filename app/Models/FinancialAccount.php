@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-#[Fillable(['area_id', 'church_id', 'name', 'type', 'institution', 'description', 'status'])]
+#[Fillable(['area_id', 'church_id', 'name', 'type', 'institution', 'description', 'status', 'is_default'])]
 class FinancialAccount extends Model
 {
     /** @use HasFactory<FinancialAccountFactory> */
@@ -76,6 +76,7 @@ class FinancialAccount extends Model
         return [
             'type' => FinancialAccountType::class,
             'status' => Status::class,
+            'is_default' => 'boolean',
         ];
     }
 }

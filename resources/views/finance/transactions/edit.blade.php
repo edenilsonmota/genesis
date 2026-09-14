@@ -18,5 +18,6 @@
             <button class="ui-button-primary" type="submit">Salvar alterações</button>
         </div>
     </form>
+    @include('finance.transactions._quick-category-modal')
 </div>
 @endsection

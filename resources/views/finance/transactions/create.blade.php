@@ -12,10 +12,7 @@
     @if ($accounts->isEmpty())
         <section class="rounded-2xl border border-warning/20 bg-warning-soft p-5 text-sm text-warning" role="status">
             <p class="font-semibold">Nenhuma conta ativa está disponível no seu escopo de escrita.</p>
-            <p class="mt-1">Cadastre ou ative as contas financeiras antes de criar uma movimentação.</p>
-            @can('viewAny', App\Models\FinancialAccount::class)
-                <a class="mt-3 inline-flex font-semibold text-brand-primary hover:text-brand-primary-hover" href="{{ route('finance.accounts.index') }}">Ir para contas financeiras →</a>
-            @endcan
+            <p class="mt-1">Verifique se a área e a igreja estão ativas. O caixa padrão é criado automaticamente nesses cadastros.</p>
         </section>
     @endif
 
@@ -27,5 +24,6 @@
             <button class="ui-button-primary" type="submit" @disabled($accounts->isEmpty())>Salvar movimentação</button>
         </div>
     </form>
+    @include('finance.transactions._quick-category-modal')
 </div>
 @endsection

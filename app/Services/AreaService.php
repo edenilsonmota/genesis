@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Area;
+use App\Services\Finance\DefaultFinancialAccountService;
+use App\Services\Finance\FinancialCategoryProvisioningService;
 use App\Status;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +12,11 @@ use Illuminate\Validation\ValidationException;
 
 class AreaService
 {
-    public function __construct(private AuditService $audit) {}
+    public function __construct(
+        private AuditService $audit,
+        private DefaultFinancialAccountService $defaultFinancialAccounts,
+        private FinancialCategoryProvisioningService $financialCategories,
+    ) {}
 
     /**
      * @param  array{name: string, description: ?string, status: string}  $attributes
@@ -28,6 +34,8 @@ class AreaService
                 }
 
                 $area = Area::query()->create($attributes);
+                $this->defaultFinancialAccounts->ensureForArea($area);
+                $this->financialCategories->ensureForArea($area);
                 $this->audit->record('area.created', 'areas', $area, 'area', $area->id, $area->only(['name', 'description', 'status']));
 
                 return $area;

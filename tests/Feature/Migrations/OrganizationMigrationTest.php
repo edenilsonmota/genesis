@@ -16,6 +16,10 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         '2026_09_12_164838_normalize_department_and_position_names.php',
         '2026_09_12_230820_create_financial_accounts_table.php',
         '2026_09_12_230821_create_financial_categories_table.php',
+        '2026_09_13_000120_create_financial_transactions_table.php',
+        '2026_09_13_000121_create_financial_movements_table.php',
+        '2026_09_14_000215_add_default_marker_to_financial_accounts_table.php',
+        '2026_09_14_002304_seed_default_financial_categories_for_existing_areas.php',
     ];
     $migrations = collect($files)->map(fn (string $file) => require database_path('migrations/'.$file));
 
@@ -32,6 +36,8 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         ->and(Schema::hasTable('audit_logs'))->toBeTrue()
         ->and(Schema::hasTable('financial_accounts'))->toBeTrue()
         ->and(Schema::hasTable('financial_categories'))->toBeTrue()
+        ->and(Schema::hasTable('financial_transactions'))->toBeTrue()
+        ->and(Schema::hasTable('financial_movements'))->toBeTrue()
         ->and(DB::table('pg_constraint')->whereIn('conname', ['departments_name_uppercase_check', 'positions_name_uppercase_check'])->count())->toBe(2)
         ->and(DB::table('pg_indexes')->where('indexname', 'areas_singleton_unique')->exists())->toBeTrue();
 });

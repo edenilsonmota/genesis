@@ -13,10 +13,10 @@ use App\Http\Requests\Finance\FinancialTransaction\ReverseFinancialTransactionRe
 use App\Http\Requests\Finance\FinancialTransaction\SettleFinancialTransactionRequest;
 use App\Http\Requests\Finance\FinancialTransaction\StoreExpenseRequest;
 use App\Http\Requests\Finance\FinancialTransaction\StoreIncomeRequest;
+use App\Http\Requests\Finance\FinancialTransaction\StoreQuickFinancialCategoryRequest;
 use App\Http\Requests\Finance\FinancialTransaction\StoreTransferRequest;
 use App\Http\Requests\Finance\FinancialTransaction\UpdateFinancialTransactionRequest;
 use App\Models\Area;
-use App\Models\Church;
 use App\Models\Department;
 use App\Models\FinancialAccount;
 use App\Models\FinancialCategory;
@@ -26,14 +26,15 @@ use App\Models\Member;
 use App\Models\User;
 use App\PermissionLevel;
 use App\Services\Finance\FinancialBalanceService;
+use App\Services\Finance\FinancialCategoryProvisioningService;
 use App\Services\Finance\FinancialTransactionService;
 use App\Services\PermissionService;
 use App\Status;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class FinancialTransactionController extends Controller
@@ -120,6 +121,22 @@ class FinancialTransactionController extends Controller
 
         return redirect()->route('finance.transactions.show', $transaction)
             ->with('success', 'Entrada registrada com sucesso.');
+    }
+
+    public function storeQuickCategory(
+        StoreQuickFinancialCategoryRequest $request,
+        FinancialCategoryProvisioningService $categories,
+    ): JsonResponse {
+        $category = $categories->createFromTransaction($request->validated(), $request->user());
+
+        return response()->json([
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'type' => $category->type->value,
+                'area_id' => $category->area_id,
+            ],
+        ], 201);
     }
 
     public function storeExpense(
@@ -227,7 +244,7 @@ class FinancialTransactionController extends Controller
     }
 
     /** @param array<string, mixed> $filters
-     * @param array<int, string> $accountIds
+     * @param  array<int, string>  $accountIds
      */
     private function filteredQuery(array $filters, array $accountIds): Builder
     {

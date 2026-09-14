@@ -49,7 +49,7 @@
     </div>
 
     <div>
-        <label class="ui-label" for="category_id">Categoria</label>
+        <div class="flex items-center justify-between gap-3"><label class="ui-label" for="category_id">Categoria</label><button class="mb-1.5 text-xs font-semibold text-brand-primary hover:text-brand-primary-hover" type="button" data-quick-category-trigger hidden>Adicionar categoria</button></div>
         <select class="ui-select" id="category_id" name="category_id" data-transaction-control data-category-select @disabled($typeValue === 'transfer')>
             <option value="">Selecione a categoria</option>
             @foreach ($categories as $category)

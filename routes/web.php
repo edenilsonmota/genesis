@@ -7,8 +7,6 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\Finance\FinancialAccountController;
-use App\Http\Controllers\Finance\FinancialCategoryController;
 use App\Http\Controllers\Finance\FinancialTransactionController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MemberMembershipController;
@@ -66,6 +64,7 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
                 Route::post('/income', [FinancialTransactionController::class, 'storeIncome'])->name('income.store');
                 Route::post('/expenses', [FinancialTransactionController::class, 'storeExpense'])->name('expenses.store');
                 Route::post('/transfers', [FinancialTransactionController::class, 'storeTransfer'])->name('transfers.store');
+                Route::post('/categories', [FinancialTransactionController::class, 'storeQuickCategory'])->name('categories.store');
                 Route::get('/{financialTransaction}', [FinancialTransactionController::class, 'show'])->name('show');
                 Route::get('/{financialTransaction}/edit', [FinancialTransactionController::class, 'edit'])->name('edit');
                 Route::put('/{financialTransaction}', [FinancialTransactionController::class, 'update'])->name('update');
@@ -74,25 +73,6 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
                 Route::post('/{financialTransaction}/reverse', [FinancialTransactionController::class, 'reverse'])->name('reverse');
             });
 
-            Route::prefix('accounts')->name('accounts.')->group(function (): void {
-                Route::get('/', [FinancialAccountController::class, 'index'])->name('index');
-                Route::get('/create', [FinancialAccountController::class, 'create'])->name('create');
-                Route::post('/', [FinancialAccountController::class, 'store'])->name('store');
-                Route::get('/{financialAccount}/edit', [FinancialAccountController::class, 'edit'])->name('edit');
-                Route::put('/{financialAccount}', [FinancialAccountController::class, 'update'])->name('update');
-                Route::patch('/{financialAccount}/activate', [FinancialAccountController::class, 'activate'])->name('activate');
-                Route::patch('/{financialAccount}/inactivate', [FinancialAccountController::class, 'inactivate'])->name('inactivate');
-            });
-
-            Route::prefix('categories')->name('categories.')->group(function (): void {
-                Route::get('/', [FinancialCategoryController::class, 'index'])->name('index');
-                Route::get('/create', [FinancialCategoryController::class, 'create'])->name('create');
-                Route::post('/', [FinancialCategoryController::class, 'store'])->name('store');
-                Route::get('/{financialCategory}/edit', [FinancialCategoryController::class, 'edit'])->name('edit');
-                Route::put('/{financialCategory}', [FinancialCategoryController::class, 'update'])->name('update');
-                Route::patch('/{financialCategory}/activate', [FinancialCategoryController::class, 'activate'])->name('activate');
-                Route::patch('/{financialCategory}/inactivate', [FinancialCategoryController::class, 'inactivate'])->name('inactivate');
-            });
         });
 
         Route::prefix('/members/{member}/church-memberships')->name('members.memberships.')->group(function (): void {

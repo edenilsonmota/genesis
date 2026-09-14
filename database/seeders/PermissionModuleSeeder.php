@@ -13,6 +13,8 @@ class PermissionModuleSeeder extends Seeder
      */
     public function run(): void
     {
+        PermissionModule::query()->whereIn('key', ['finance.accounts', 'finance.categories'])->delete();
+
         foreach (self::definitions() as $key => $attributes) {
             PermissionModule::query()->updateOrCreate(
                 ['key' => $key],
@@ -38,8 +40,6 @@ class PermissionModuleSeeder extends Seeder
             'finance.overview' => ['name' => 'Visão financeira', 'description' => 'Consulta consolidada de saldos, entradas e saídas.', 'category' => 'Financeiro'],
             'finance.transactions' => ['name' => 'Movimentações financeiras', 'description' => 'Gestão de entradas, despesas, ajustes e transferências.', 'category' => 'Financeiro'],
             'finance.tithes' => ['name' => 'Dízimos', 'description' => 'Gestão do recebimento de dízimos.', 'category' => 'Financeiro'],
-            'finance.accounts' => ['name' => 'Contas financeiras', 'description' => 'Gestão das contas financeiras da área e das igrejas.', 'category' => 'Financeiro'],
-            'finance.categories' => ['name' => 'Categorias financeiras', 'description' => 'Gestão das categorias de entrada e saída.', 'category' => 'Financeiro'],
             'finance.reports' => ['name' => 'Relatórios financeiros', 'description' => 'Consulta de demonstrativos e exportações financeiras.', 'category' => 'Financeiro'],
         ];
     }
