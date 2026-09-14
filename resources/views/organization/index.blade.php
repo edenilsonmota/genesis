@@ -136,9 +136,9 @@
                                 <tr>
                                     <td class="px-8 py-4">
                                         <p class="font-semibold text-text-primary">{{ $church->name }}</p>
-                                        <p class="mt-1 text-xs text-text-secondary">CEP {{ substr($church->postal_code, 0, 5).'-'.substr($church->postal_code, 5) }}</p>
+                                        <p class="mt-1 text-xs text-text-secondary">{{ $church->postal_code ? 'CEP '.substr($church->postal_code, 0, 5).'-'.substr($church->postal_code, 5) : 'Endereço não informado' }}</p>
                                     </td>
-                                    <td class="px-5 py-4 text-text-secondary">{{ $church->city->name }} · {{ $church->city->state->abbreviation }}</td>
+                                    <td class="px-5 py-4 text-text-secondary">{{ $church->city ? $church->city->name.' · '.$church->city->state->abbreviation : 'Localização não informada' }}</td>
                                     <td class="px-5 py-4"><x-status-badge :status="$church->status" /></td>
                                     <td class="px-8 py-4">
                                         <div class="flex justify-end gap-2">
@@ -165,7 +165,7 @@
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <h3 class="font-semibold text-text-primary">{{ $church->name }}</h3>
-                                    <p class="mt-1 text-sm text-text-secondary">{{ $church->city->name }} · {{ $church->city->state->abbreviation }}</p>
+                                    <p class="mt-1 text-sm text-text-secondary">{{ $church->city ? $church->city->name.' · '.$church->city->state->abbreviation : 'Localização não informada' }}</p>
                                 </div>
                                 <x-status-badge :status="$church->status" />
                             </div>

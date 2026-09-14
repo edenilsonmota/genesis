@@ -94,6 +94,12 @@ it('creates a church with only its name and defaults it to active', function () 
         'city_id' => null,
         'postal_code' => null,
     ]);
+
+    $this->actingAs($administrator)->get(route('organization.index'))
+        ->assertOk()
+        ->assertSee('Igreja sem endereço')
+        ->assertSee('Endereço não informado')
+        ->assertSee('Localização não informada');
 });
 
 it('requires state and city together when an address location is informed', function () {
