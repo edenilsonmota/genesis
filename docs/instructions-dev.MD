@@ -1,12 +1,8 @@
-# Desenvolvimento e deploy
+# Desenvolvimento
 
-Genesis e uma aplicacao Laravel 13 em PHP 8.4.1 ou superior, com PostgreSQL 18, Redis,
-Vite e Tailwind. O ambiente local oficial e o Laravel Sail, definido em
+Genesis e uma aplicacao Laravel 13 em PHP 8.4.1 ou superior, PostgreSQL 18,
+Redis, Vite e Tailwind. O ambiente local oficial e o Laravel Sail, definido em
 `compose.yaml`.
-
-O Sail e destinado ao desenvolvimento. Ele monta o codigo-fonte no container,
-expoe portas locais e usa imagens de runtime de desenvolvimento; portanto, nao
-deve ser usado como a composicao de producao do subdominio.
 
 ## Desenvolvimento local com Sail
 
@@ -17,7 +13,7 @@ deve ser usado como a composicao de producao do subdominio.
 
 ### Primeiro uso
 
-1. Crie o ambiente local antes de iniciar os containers:
+1. Crie o ambiente local:
 
    ```bash
    cp .env.example .env
@@ -80,142 +76,18 @@ O Seeder de localidades usa o snapshot versionado
 `database/data/ibge-localities.json`. O comando de download consulta a API do
 IBGE, devendo ser revisado e versionado antes de ser usado em uma entrega.
 
-## Producao atras do reverse proxy central
+## Dicas para producao
 
-O servidor ja hospeda sob outros subdominios. Assim, somente o reverse
-proxy central (Caddy) pode publicar as portas `80` e `443`; Genesis deve usar
-uma composicao de producao propria, conectada a rede Docker externa
-`web-proxy` e sem portas publicadas.
+- Mantenha o Sail apenas para desenvolvimento; use imagens e Compose de
+  producao separados.
+- Nunca versione `.env.production`, senhas ou chaves SSH. Use
+  `.env.production.example` como modelo.
+- Execute `php artisan migrate --force` explicitamente no deploy e rode
+  seeders apenas no primeiro provisionamento ou quando forem necessarios.
+- Atras de proxy HTTPS, configure `APP_URL` e proxies confiaveis no backend.
+- Preserve o armazenamento e banco em volumes persistentes, com credenciais e
+  volumes exclusivos por projeto.
+- Valide o health check e a pagina de login apos cada deploy.
 
-Fluxo esperado:
-
-```text
-Internet -> Caddy :80/:443 -> genesis-nginx:80 -> PHP-FPM -> Laravel
-```
-
-O repositorio possui uma infraestrutura de producao separada do Sail:
-
-- `Dockerfile`: imagens PHP-FPM e Nginx, com dependencias otimizadas e assets
-  compilados;
-- `docker-compose.prod.yml`: alternativa para um servidor que seja dono das
-  portas `80` e `443`;
-- `docker-compose.proxy.yml`: composicao apropriada para este servidor, que
-  usa o Caddy central e a rede externa `web-proxy`;
-- `.env.production.example`: modelo sem credenciais ou dominio real;
-- `docker/nginx/proxy.conf.template`: Nginx interno HTTP para uso atras do
-  Caddy.
-
-O primeiro provisionamento sera feito passo a passo. Ate la, nao execute os
-comandos de producao diretamente no servidor.
-
-### Parametros que a composicao de producao deve respeitar
-
-- A imagem deve instalar PHP 8.4.1 ou superior com extensoes para PostgreSQL e Redis, as
-  dependencias Composer sem `require-dev`, e executar `npm ci` seguido de
-  `npm run build`.
-- O Nginx interno deve expor apenas a porta `80` na rede `web-proxy`, com o
-  alias `genesis-nginx`.
-- PostgreSQL e Redis devem ficar isolados na rede interna do projeto, com
-  volumes nomeados exclusivos de Genesis. Nao reutilize os volumes, banco ou
-  credenciais do CCT. PostgreSQL 18 deve montar seu volume em
-  `/var/lib/postgresql`, conforme a imagem oficial.
-- Os valores atuais de `QUEUE_CONNECTION=database` e `CACHE_STORE=database`
-  nao exigem Redis para a aplicacao. Redis pode permanecer disponivel para uso
-  futuro, mas nao e necessario criar worker de fila ou scheduler: o projeto
-  ainda nao define jobs despachados nem tarefas agendadas.
-- A imagem deve manter `storage` em volume persistente e criar o link
-  `public/storage` durante o provisionamento.
-- Migrations devem ser executadas explicitamente com `php artisan migrate
-  --force` no deploy, nunca automaticamente em todo boot de container.
-
-### Ambiente de producao
-
-O arquivo de ambiente deve existir somente no servidor e nunca ser enviado ao
-Git. Copie `.env.production.example` para `.env.production` no diretorio de
-deploy e preencha os valores reais. Os valores minimos sao:
-
-```dotenv
-APP_NAME=Genesis
-APP_ENV=production
-APP_KEY=base64:gere-uma-chave-unica
-APP_DEBUG=false
-APP_URL=https://seu-subdominio.example.com
-
-DB_CONNECTION=pgsql
-DB_HOST=postgres
-DB_PORT=5432
-DB_DATABASE=genesis
-DB_USERNAME=genesis
-DB_PASSWORD=uma-senha-forte-e-exclusiva
-
-SESSION_DRIVER=database
-CACHE_STORE=database
-QUEUE_CONNECTION=database
-
-REDIS_HOST=redis
-REDIS_PASSWORD=outra-senha-forte-e-exclusiva
-
-GENESIS_ADMIN_NAME="Administrador Genesis"
-GENESIS_ADMIN_USERNAME=genesis.admin
-GENESIS_ADMIN_PASSWORD="uma-senha-inicial-forte"
-```
-
-Gere `APP_KEY` no ambiente da imagem de producao com
-`php artisan key:generate --show` e copie somente o valor retornado. Depois do
-primeiro seed, remova `GENESIS_ADMIN_PASSWORD` do arquivo de ambiente para nao
-deixar uma senha inicial permanente no servidor.
-
-Como Caddy termina o HTTPS, Laravel confia nos headers `X-Forwarded-*`
-enviados pelo proxy quando `TRUSTED_PROXIES=*` estiver definido no ambiente.
-Essa configuracao esta declarada em `bootstrap/app.php`.
-
-### Caddy central
-
-Com a rede `web-proxy` ja criada no servidor, adicione este bloco ao Caddyfile
-central e recarregue o Caddy pelo procedimento ja adotado no servidor:
-
-```caddyfile
-seu-subdominio.example.com {
-    reverse_proxy genesis-nginx:80
-}
-```
-
-Antes disso, crie o registro DNS `A` do subdominio apontando para o IP da VPS.
-O Caddy obtera e renovara o certificado HTTPS; Genesis nao deve executar
-Certbot nem publicar `80:80` ou `443:443`.
-
-### GitHub Actions e deploy
-
-O repositorio inclui `.github/workflows/deploy.yml`. O workflow e acionado por
-push em `main` ou manualmente, conecta por SSH e executa `deploy.sh`. Antes do
-primeiro push que inclua esse workflow, configure o ambiente `production` e os
-secrets abaixo no repositorio Genesis:
-
-- `VPS_HOST`
-- `VPS_PORT`
-- `VPS_USER`
-- `VPS_SSH_KEY_BASE64`: chave privada SSH codificada em Base64, em uma unica linha.
-
-O `deploy.sh` atualiza o checkout com `git pull --ff-only`, constroi as
-imagens, sobe os servicos, executa `php artisan migrate --force` e reconstrui
-os caches com `php artisan optimize`. Ele falha imediatamente se qualquer
-etapa falhar, nao executa seeders e nao altera o Caddy.
-
-Nao reutilize diretorio, containers, imagens, volumes ou aliases do CCT.
-Genesis deve usar um diretorio de deploy proprio e o alias `genesis-nginx`.
-
-## Verificacao apos o deploy
-
-1. Confirme que os containers Genesis estao saudaveis e ligados a `web-proxy`.
-2. Abra `https://seu-subdominio.example.com/up`; Laravel deve responder `200`.
-3. Abra a pagina de login e valide que os redirects e cookies usam HTTPS.
-4. Consulte os logs do Nginx, PHP e Caddy caso haja erro `502` ou redirect
-   para HTTP.
-
-## Seguranca e backup
-
-- Nunca versione `.env`, `.env.production`, chaves SSH ou senhas.
-- Mantenha `APP_DEBUG=false` em producao.
-- Use credenciais de banco e Redis exclusivas para Genesis.
-- Faça backup regular do volume do PostgreSQL e de `storage` antes de
-  migrations de risco ou atualizacoes relevantes.
+Para um roteiro genérico reutilizável de VPS, Docker, Caddy, HTTPS e GitHub
+Actions, mantenha um guia local fora do Git.
