@@ -165,11 +165,9 @@ Gere `APP_KEY` no ambiente da imagem de producao com
 primeiro seed, remova `GENESIS_ADMIN_PASSWORD` do arquivo de ambiente para nao
 deixar uma senha inicial permanente no servidor.
 
-Como Caddy termina o HTTPS, Laravel tambem deve confiar nos headers
-`X-Forwarded-*` enviados pelo proxy. A implementacao da composicao de
-producao deve incluir `TRUSTED_PROXIES=*` no ambiente **e** configurar
-`trustProxies` em `bootstrap/app.php`; Genesis ainda nao possui essa
-configuracao.
+Como Caddy termina o HTTPS, Laravel confia nos headers `X-Forwarded-*`
+enviados pelo proxy quando `TRUSTED_PROXIES=*` estiver definido no ambiente.
+Essa configuracao esta declarada em `bootstrap/app.php`.
 
 ### Caddy central
 
