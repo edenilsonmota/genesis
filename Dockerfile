@@ -10,7 +10,7 @@ RUN composer install \
     --no-progress \
     --optimize-autoloader
 
-FROM php:8.3-fpm-bookworm AS app-base
+FROM php:8.4-fpm-bookworm AS app-base
 WORKDIR /var/www/html
 
 RUN apt-get update \

@@ -1,6 +1,6 @@
 # Desenvolvimento e deploy
 
-Genesis e uma aplicacao Laravel 13 em PHP 8.3, com PostgreSQL 18, Redis,
+Genesis e uma aplicacao Laravel 13 em PHP 8.4.1 ou superior, com PostgreSQL 18, Redis,
 Vite e Tailwind. O ambiente local oficial e o Laravel Sail, definido em
 `compose.yaml`.
 
@@ -110,7 +110,7 @@ comandos de producao diretamente no servidor.
 
 ### Parametros que a composicao de producao deve respeitar
 
-- A imagem deve instalar PHP 8.3 com extensoes para PostgreSQL e Redis, as
+- A imagem deve instalar PHP 8.4.1 ou superior com extensoes para PostgreSQL e Redis, as
   dependencias Composer sem `require-dev`, e executar `npm ci` seguido de
   `npm run build`.
 - O Nginx interno deve expor apenas a porta `80` na rede `web-proxy`, com o
