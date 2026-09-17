@@ -186,19 +186,20 @@ Certbot nem publicar `80:80` ou `443:443`.
 
 ### GitHub Actions e deploy
 
-O deploy deve seguir o mesmo padrao do CCT: um workflow acionado por push em
-`main` conecta por SSH e executa um script local do servidor. Os secrets
-necessarios no ambiente `production` do repositorio Genesis sao:
+O repositorio inclui `.github/workflows/deploy.yml`. O workflow e acionado por
+push em `main` ou manualmente, conecta por SSH e executa `deploy.sh`. Antes do
+primeiro push que inclua esse workflow, configure o ambiente `production` e os
+secrets abaixo no repositorio Genesis:
 
 - `VPS_HOST`
 - `VPS_PORT`
 - `VPS_USER`
 - `VPS_SSH_KEY`
 
-O script de deploy deve, em ordem, atualizar o checkout com `git pull
---ff-only`, construir a imagem de producao, subir os servicos, executar
-`php artisan migrate --force` e reconstruir os caches de configuracao, rotas e
-views. Ele deve falhar imediatamente se qualquer etapa falhar.
+O `deploy.sh` atualiza o checkout com `git pull --ff-only`, constroi as
+imagens, sobe os servicos, executa `php artisan migrate --force` e reconstrui
+os caches com `php artisan optimize`. Ele falha imediatamente se qualquer
+etapa falhar, nao executa seeders e nao altera o Caddy.
 
 Nao reutilize diretorio, containers, imagens, volumes ou aliases do CCT.
 Genesis deve usar um diretorio de deploy proprio e o alias `genesis-nginx`.
