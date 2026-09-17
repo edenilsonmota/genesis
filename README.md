@@ -16,48 +16,10 @@ Na sidebar, Administração contém **Usuários**, **Cargos e permissões** e **
 
 A fundação do módulo Financeiro está documentada separadamente em [contexto financeiro](docs/finance/financial-implementation-context.md), [modelo financeiro](docs/finance/financial-domain-model.mmd) e [roadmap financeiro](docs/finance/financial-roadmap.md).
 
-## Instalação local
+## Desenvolvimento
 
-Instale as dependências PHP e suba os containers do Sail:
-
-```bash
-composer install
-./vendor/bin/sail up -d
-```
-
-Crie o arquivo de ambiente caso ainda não exista e configure as credenciais técnicas:
-
-```bash
-cp .env.example .env
-```
-
-```dotenv
-GENESIS_ADMIN_NAME="Administrador Genesis"
-GENESIS_ADMIN_USERNAME=genesis.admin
-GENESIS_ADMIN_PASSWORD="uma-senha-segura"
-```
-
-Gere a chave da aplicação e execute as migrations:
-
-```bash
-./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan migrate
-```
-
-Instale as dependências do frontend e mantenha o Vite em execução durante o desenvolvimento:
-
-```bash
-./vendor/bin/sail npm install
-./vendor/bin/sail npm run dev
-```
-
-Com o Sail e o Vite rodando, acesse `http://localhost`.
-
-Para preparar os assets sem manter o Vite aberto, use:
-
-```bash
-./vendor/bin/sail npm run build
-```
+Consulte as [instruções de desenvolvimento](docs/instructions-dev.md) para
+configurar o Sail, executar migrations, seeders e comandos frequentes.
 
 ## Catálogo de localidades
 
