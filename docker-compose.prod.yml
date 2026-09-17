@@ -1,0 +1,88 @@
+services:
+  app:
+    build:
+      context: .
+      target: app
+    image: genesis/app:prod
+    restart: unless-stopped
+    env_file:
+      - ${APP_ENV_FILE:-.env.production}
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    volumes:
+      - app-storage:/var/www/html/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  nginx:
+    build:
+      context: .
+      target: nginx
+    image: genesis/nginx:prod
+    restart: unless-stopped
+    env_file:
+      - ${APP_ENV_FILE:-.env.production}
+    command: >
+      sh -c "if [ ! -f /etc/letsencrypt/live/$${APP_DOMAIN}/fullchain.pem ]; then
+      mkdir -p /etc/letsencrypt/live/$${APP_DOMAIN} &&
+      openssl req -x509 -nodes -newkey rsa:2048 -days 1
+      -keyout /etc/letsencrypt/live/$${APP_DOMAIN}/privkey.pem
+      -out /etc/letsencrypt/live/$${APP_DOMAIN}/fullchain.pem
+      -subj /CN=$${APP_DOMAIN};
+      fi;
+      /docker-entrypoint.sh nginx -g 'daemon off;'"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+      - app-storage:/var/www/html/storage:ro
+    depends_on:
+      - app
+
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    env_file:
+      - ${APP_ENV_FILE:-.env.production}
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-genesis}
+      POSTGRES_USER: ${DB_USERNAME:-genesis}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    env_file:
+      - ${APP_ENV_FILE:-.env.production}
+    command: sh -c "redis-server --appendonly yes --requirepass \"$${REDIS_PASSWORD}\""
+    volumes:
+      - redis-data:/data
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+
+volumes:
+  app-storage:
+  postgres-data:
+  redis-data:
+  letsencrypt:
+  certbot-webroot:
