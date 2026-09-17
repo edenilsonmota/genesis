@@ -194,7 +194,7 @@ secrets abaixo no repositorio Genesis:
 - `VPS_HOST`
 - `VPS_PORT`
 - `VPS_USER`
-- `VPS_SSH_KEY`
+- `VPS_SSH_KEY_BASE64`: chave privada SSH codificada em Base64, em uma unica linha.
 
 O `deploy.sh` atualiza o checkout com `git pull --ff-only`, constroi as
 imagens, sobe os servicos, executa `php artisan migrate --force` e reconstrui
