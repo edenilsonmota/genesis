@@ -67,4 +67,4 @@ O Seeder lê exclusivamente o snapshot versionado `database/data/ibge-localities
 ./vendor/bin/sail artisan ibge:download-localities
 ```
 
-Revise e versione o snapshot após a atualização. Migrations, Seeders e testes não acessam serviços externos.
+Revise e versione o snapshot após a atualização. Migrations, Seeders e testes não acessam serviços externos..
