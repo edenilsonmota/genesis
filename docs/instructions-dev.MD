@@ -117,7 +117,8 @@ comandos de producao diretamente no servidor.
   alias `genesis-nginx`.
 - PostgreSQL e Redis devem ficar isolados na rede interna do projeto, com
   volumes nomeados exclusivos de Genesis. Nao reutilize os volumes, banco ou
-  credenciais do CCT.
+  credenciais do CCT. PostgreSQL 18 deve montar seu volume em
+  `/var/lib/postgresql`, conforme a imagem oficial.
 - Os valores atuais de `QUEUE_CONNECTION=database` e `CACHE_STORE=database`
   nao exigem Redis para a aplicacao. Redis pode permanecer disponivel para uso
   futuro, mas nao e necessario criar worker de fila ou scheduler: o projeto
