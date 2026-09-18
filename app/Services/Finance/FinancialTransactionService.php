@@ -54,7 +54,7 @@ class FinancialTransactionService
         );
     }
 
-    /** @param array{payment_method: string, description: ?string} $data */
+    /** @param array{amount: string, competence_month_number: int, competence_year: int, payment_method: string, description: ?string} $data */
     public function updateTitheDetails(FinancialTransaction $financialTransaction, array $data, User $actor): FinancialTransaction
     {
         return $this->execute('update_tithe_details', $financialTransaction, function () use ($financialTransaction, $data, $actor): FinancialTransaction {
@@ -67,15 +67,19 @@ class FinancialTransactionService
 
             $account = $transaction->movements->first()->account;
             $this->assertAccountCanBeUsed($actor, $account, 'financial_transaction', requireActive: false, permissionModule: 'finance.tithes');
-            $before = ['payment_method' => $transaction->payment_method?->value, 'description' => $transaction->description];
+            $before = ['amount' => $transaction->amount, 'competence_month' => $transaction->competence_month?->toDateString(), 'payment_method' => $transaction->payment_method?->value, 'description' => $transaction->description];
+            $competenceMonth = sprintf('%d-%02d-01', $data['competence_year'], $data['competence_month_number']);
+            $transaction->movements->first()->update(['amount' => $data['amount']]);
             $transaction->update([
+                'amount' => $data['amount'],
+                'competence_month' => $competenceMonth,
                 'payment_method' => $data['payment_method'],
                 'description' => $data['description'],
                 'updated_by_user_id' => $actor->id,
             ]);
             $this->recordAudit('financial_tithe.details_updated', $transaction->load('movements'), $account, [
                 'before' => $before,
-                'after' => ['payment_method' => $transaction->payment_method?->value, 'description' => $transaction->description],
+                'after' => ['amount' => $transaction->amount, 'competence_month' => $transaction->competence_month?->toDateString(), 'payment_method' => $transaction->payment_method?->value, 'description' => $transaction->description],
             ]);
 
             return $transaction;
@@ -214,9 +218,9 @@ class FinancialTransactionService
         });
     }
 
-    public function reverse(FinancialTransaction $financialTransaction, string $reason, User $actor): FinancialTransaction
+    public function reverse(FinancialTransaction $financialTransaction, string $reason, User $actor, string $permissionModule = 'finance.transactions'): FinancialTransaction
     {
-        return $this->execute('reverse', $financialTransaction, function () use ($financialTransaction, $reason, $actor): FinancialTransaction {
+        return $this->execute('reverse', $financialTransaction, function () use ($financialTransaction, $reason, $actor, $permissionModule): FinancialTransaction {
             $original = FinancialTransaction::query()->lockForUpdate()->findOrFail($financialTransaction->id);
             $original->load(['movements' => fn ($query) => $query->lockForUpdate(), 'movements.account']);
 
@@ -229,7 +233,7 @@ class FinancialTransactionService
 
             $this->assertMovementStructure($original);
             foreach ($original->movements as $movement) {
-                $this->assertAccountCanBeUsed($actor, $movement->account, 'financial_transaction', requireActive: false);
+                $this->assertAccountCanBeUsed($actor, $movement->account, 'financial_transaction', requireActive: false, permissionModule: $permissionModule);
             }
 
             $today = today()->toDateString();
@@ -271,7 +275,7 @@ class FinancialTransactionService
             ]);
             $reversal->load('movements.account');
             $this->assertMovementStructure($reversal);
-            $this->recordAudit('financial_transaction.reversed', $original, $original->movements->first()->account, [
+            $this->recordAudit($original->origin === FinancialTransactionOrigin::Tithe ? 'financial_tithe.reversed' : 'financial_transaction.reversed', $original, $original->movements->first()->account, [
                 'reason' => $reason,
                 'reversal_transaction_id' => $reversal->id,
                 'accounts' => $original->movements->pluck('financial_account_id')->all(),

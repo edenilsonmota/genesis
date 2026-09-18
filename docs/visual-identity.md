@@ -68,3 +68,5 @@ Todo elemento interativo deve preservar foco visível em ciano, rótulos acessí
 O Flowbite livre é instalado pelo npm e integrado ao Vite/Tailwind, exclusivamente para comportamentos e componentes compatíveis com esta linguagem visual. Componentes Pro, CDN em produção e estilos globais que substituam os tokens do Genesis+ não são permitidos.
 
 Máscaras de campos são implementadas com `IMask`, empacotado pelo Vite. Todo novo campo monetário deve usar `data-currency-input`: a interface apresenta `R$ 10,00` e o JavaScript envia o valor numérico normalizado ao backend. A validação no servidor continua obrigatória.
+
+Todos os campos simples de data usam Flatpickr como padrão global (`resources/js/date-inputs.js`), com calendário e valor alternativo em português do Brasil (`dd/mm/aaaa`). O valor submetido continua sendo `YYYY-MM-DD`; novos campos de data devem usar `type="date"` para aderir automaticamente ao padrão.

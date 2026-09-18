@@ -51,7 +51,9 @@
             </div>
         @endif
 
-        <form class="grid gap-3 border-b border-border-default bg-surface-muted/60 p-5 md:grid-cols-2 xl:grid-cols-4" method="GET">
+        <details class="border-b border-border-default bg-surface-muted/60" @if(! empty($filters['search']) || ! empty($filters['status']) || ! empty($filters['scope_type']) || ! empty($filters['scope_id']) || ! empty($filters['account_id']) || ! empty($filters['category_id']) || ! empty($filters['department_id']) || ! empty($filters['responsible_member_id'])) open @endif>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-semibold text-text-primary marker:content-none"><span class="flex items-center gap-2"><svg class="size-4 text-brand-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4" /></svg>Filtros</span><span class="text-xs font-medium text-text-secondary">Expandir ou recolher</span></summary>
+        <form class="grid gap-3 border-t border-border-default p-5 md:grid-cols-2 xl:grid-cols-4" method="GET">
             <input type="hidden" name="all_periods" value="1">
             <div class="xl:col-span-2">
                 <label class="ui-label" for="transaction-search">Busca</label>
@@ -116,8 +118,12 @@
                 <a class="ui-button-outline" href="{{ route('finance.transactions.index', ['all_periods' => 1]) }}">Limpar</a>
             </div>
         </form>
+        </details>
 
         <div class="divide-y divide-border-default">
+            <div class="hidden bg-surface-muted px-5 py-3 text-xs font-semibold tracking-wide text-text-secondary uppercase xl:grid xl:grid-cols-[6.5rem_minmax(12rem,1.4fr)_minmax(10rem,1fr)_9rem_8rem_auto] xl:items-center xl:gap-4">
+                <span>Data</span><span>Lançamento</span><span>Responsável</span><span>Valor</span><span>Status</span><span class="text-right">Ações</span>
+            </div>
             @forelse ($transactions as $transaction)
                 @php
                     $outflow = $transaction->movements->firstWhere('direction', App\Enums\FinancialMovementDirection::Outflow);
@@ -125,12 +131,16 @@
                     $accountLabel = $transaction->type === App\Enums\FinancialTransactionType::Transfer
                         ? ($outflow?->account?->name.' → '.$inflow?->account?->name)
                         : ($transaction->movements->first()?->account?->name ?? 'Conta indisponível');
+                    $titleLabel = $transaction->title;
+                    if ($transaction->origin === App\Enums\FinancialTransactionOrigin::Tithe && $transaction->competence_month) {
+                        $titleLabel .= ' · '.$transaction->competence_month->format('m/Y');
+                    }
                 @endphp
                 <article class="grid gap-4 p-5 xl:grid-cols-[6.5rem_minmax(12rem,1.4fr)_minmax(10rem,1fr)_9rem_8rem_auto] xl:items-center">
                     <time class="text-sm font-medium text-text-secondary" datetime="{{ $transaction->occurred_on->toDateString() }}">{{ $transaction->occurred_on->format('d/m/Y') }}</time>
                     <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-2">
-                            <h2 class="font-semibold text-text-primary">{{ $transaction->title }}</h2>
+                            <h2 class="font-semibold text-text-primary">{{ $titleLabel }}</h2>
                             <span @class([
                                 'rounded-full px-2.5 py-1 text-xs font-semibold',
                                 'bg-success-soft text-success' => $transaction->type === App\Enums\FinancialTransactionType::Income,

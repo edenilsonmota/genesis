@@ -9,3 +9,4 @@ import './financial-owner';
 import './financial-transactions';
 import './currency-inputs';
 import './select-autosize';
+import './date-inputs';

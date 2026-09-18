@@ -72,6 +72,8 @@ Para gerar assets sem servidor de desenvolvimento:
 
 `migrate:fresh --seed` apaga o banco local; nunca o use contra producao.
 
+O frontend usa IMask para valores monetários e Flatpickr para datas. Ambos são dependências npm compiladas pelo Vite; não use CDN em produção nem calendários dependentes da localidade do navegador.
+
 O Seeder de localidades usa o snapshot versionado
 `database/data/ibge-localities.json`. O comando de download consulta a API do
 IBGE, devendo ser revisado e versionado antes de ser usado em uma entrega.

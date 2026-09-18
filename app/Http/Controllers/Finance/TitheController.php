@@ -7,7 +7,7 @@ use App\Enums\FinancialTransactionOrigin;
 use App\Enums\FinancialTransactionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\Tithe\StoreTitheRequest;
-use App\Http\Requests\Finance\Tithe\UpdateTitheDetailsRequest;
+use App\Http\Requests\Finance\Tithe\UpdateTitheRequest;
 use App\Models\Church;
 use App\Models\FinancialAccount;
 use App\Models\FinancialCategory;
@@ -45,6 +45,7 @@ class TitheController extends Controller
                 'financialTransactions' => fn ($query) => $query
                     ->where('origin', FinancialTransactionOrigin::Tithe->value)
                     ->where('status', FinancialTransactionStatus::Settled->value)
+                    ->whereNull('reversed_at')
                     ->whereDate('competence_month', $referenceMonth->toDateString())
                     ->whereHas('movements.account', fn (Builder $query): Builder => $query->where('church_id', $church->id))
                     ->latest('occurred_on'),
@@ -119,7 +120,7 @@ class TitheController extends Controller
     }
 
     public function updateDetails(
-        UpdateTitheDetailsRequest $request,
+        UpdateTitheRequest $request,
         FinancialTransaction $financialTransaction,
         PermissionService $permissions,
         FinancialTransactionService $transactions,
@@ -136,6 +137,15 @@ class TitheController extends Controller
         $transactions->updateTitheDetails($financialTransaction, $request->validated(), $request->user());
 
         return back()->with('success', 'Detalhes do dízimo atualizados com sucesso.');
+    }
+
+    public function reverse(Request $request, FinancialTransaction $financialTransaction, PermissionService $permissions, FinancialTransactionService $transactions): RedirectResponse
+    {
+        $church = $permissions->currentChurch($request->user());
+        abort_unless($church !== null && $financialTransaction->origin === FinancialTransactionOrigin::Tithe && $permissions->can($request->user(), 'finance.tithes', PermissionLevel::Write, $church) && $financialTransaction->movements()->whereHas('account', fn (Builder $query): Builder => $query->where('church_id', $church->id))->exists(), 404);
+        $transactions->reverse($financialTransaction, 'Dízimo removido pela tela de dízimos.', $request->user(), 'finance.tithes');
+
+        return redirect()->route('finance.tithes.index')->with('success', 'Dízimo apagado por estorno; o histórico foi preservado.');
     }
 
     /** @return \Illuminate\Database\Eloquent\Collection<int, Member> */

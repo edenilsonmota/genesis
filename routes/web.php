@@ -72,6 +72,7 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
                 Route::post('/', [TitheController::class, 'store'])->name('store');
                 Route::get('/{financialTransaction}', [TitheController::class, 'show'])->name('show');
                 Route::patch('/{financialTransaction}/details', [TitheController::class, 'updateDetails'])->name('details.update');
+                Route::post('/{financialTransaction}/reverse', [TitheController::class, 'reverse'])->name('reverse');
             });
             Route::prefix('transactions')->name('transactions.')->group(function (): void {
                 Route::get('/', [FinancialTransactionController::class, 'index'])->name('index');

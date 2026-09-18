@@ -49,7 +49,7 @@
                                         <td class="px-5 py-4 font-semibold text-success">R$ {{ number_format((float) $tithe->amount, 2, ',', '.') }}</td>
                                         <td class="px-5 py-4 text-text-secondary">{{ $tithe->occurred_on->format('d/m/Y') }}</td>
                                         <td class="px-5 py-4 text-text-secondary">{{ $tithe->competence_month->format('m/Y') }}</td>
-                                        <td class="px-7 py-4 text-right"><a class="ui-button-secondary rounded-lg px-3 py-2 text-xs" href="{{ route('finance.tithes.show', $tithe) }}">Visualizar</a></td>
+                                        <td class="px-7 py-4"><div class="flex flex-wrap justify-end gap-2"><a class="ui-button-secondary rounded-lg px-3 py-2 text-xs" href="{{ route('finance.tithes.show', $tithe) }}">Visualizar</a>@if ($canWrite)<form method="POST" action="{{ route('finance.tithes.reverse', $tithe) }}" data-confirm="Tem certeza que deseja apagar este dízimo? O saldo será estornado e o histórico será preservado.">@csrf<button class="ui-button-danger rounded-lg px-3 py-2 text-xs" type="submit">Apagar</button></form>@endif</div></td>
                                     @elseif ($canWrite)
                                         @php $formId = 'tithe-'.$member->id; @endphp
                                         <td class="px-5 py-4"><input class="ui-input min-w-32 py-2 text-sm" form="{{ $formId }}" name="amount" inputmode="decimal" placeholder="R$ 0,00" required data-currency-input></td>
