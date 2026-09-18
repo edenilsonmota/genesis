@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Area;
+use App\Models\CalendarEvent;
 use App\Models\Church;
 use App\Models\Department;
 use App\Models\FinancialTransaction;
@@ -11,6 +12,7 @@ use App\Models\Position;
 use App\Models\User;
 use App\PermissionLevel;
 use App\Policies\AreaPolicy;
+use App\Policies\CalendarEventPolicy;
 use App\Policies\ChurchPolicy;
 use App\Policies\DepartmentPolicy;
 use App\Policies\FinancialTransactionPolicy;
@@ -49,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
         );
 
         Gate::policy(Area::class, AreaPolicy::class);
+        Gate::policy(CalendarEvent::class, CalendarEventPolicy::class);
         Gate::policy(Church::class, ChurchPolicy::class);
         Gate::policy(Department::class, DepartmentPolicy::class);
         Gate::policy(FinancialTransaction::class, FinancialTransactionPolicy::class);

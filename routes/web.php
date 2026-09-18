@@ -1,10 +1,14 @@
 <?php
 
 use App\Http\Controllers\ActiveChurchController;
-use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordController;
+use App\Http\Controllers\CalendarEventController;
+use App\Http\Controllers\CalendarEventFeedController;
+use App\Http\Controllers\CalendarEventScheduleController;
+use App\Http\Controllers\CalendarEventTypeController;
 use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
@@ -36,6 +40,18 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
 
     Route::middleware('password.changed')->group(function (): void {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
+        Route::prefix('calendar')->name('calendar.')->group(function (): void {
+            Route::get('/', [CalendarEventController::class, 'index'])->name('index');
+            Route::get('/feed', CalendarEventFeedController::class)->name('feed');
+            Route::post('/event-types', [CalendarEventTypeController::class, 'store'])->name('event-types.store');
+            Route::get('/events/create', [CalendarEventController::class, 'create'])->name('events.create');
+            Route::post('/events', [CalendarEventController::class, 'store'])->name('events.store');
+            Route::get('/events/{calendarEvent}', [CalendarEventController::class, 'show'])->name('events.show');
+            Route::get('/events/{calendarEvent}/edit', [CalendarEventController::class, 'edit'])->name('events.edit');
+            Route::put('/events/{calendarEvent}', [CalendarEventController::class, 'update'])->name('events.update');
+            Route::patch('/events/{calendarEvent}/schedule', CalendarEventScheduleController::class)->name('events.schedule');
+            Route::patch('/events/{calendarEvent}/cancel', [CalendarEventController::class, 'cancel'])->name('events.cancel');
+        });
         Route::get('/audit', AuditLogController::class)->name('audit.index');
         Route::patch('/active-church', [ActiveChurchController::class, 'update'])->name('active-church.update');
 

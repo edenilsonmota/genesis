@@ -53,6 +53,18 @@ Apache ECharts é a biblioteca padrão para gráficos interativos. Deve ser impo
 - Legendas nunca podem disputar espaço com eixos ou rótulos: ficam abaixo da área de plotagem, com espaço reservado no `grid.bottom`, ícone `roundRect` e texto legível. Quando houver muitos itens, usar legenda rolável ou adaptar a orientação.
 - Preservar tooltip em português do Brasil, valores em real brasileiro, `aria.enabled` e `ResizeObserver` para acessibilidade e responsividade. Rótulos extensos devem truncar, girar ou ganhar mais espaço de grade antes de sobrepor conteúdo.
 
+## Agenda
+
+FullCalendar é a biblioteca padrão para calendários e agendas. Deve ser instalado pelo npm, empacotado pelo Vite e carregado apenas na tela que contém o calendário. O Genesis+ usa os plugins padrão de ano em mini-meses, mês, semana/dia com horários, lista e interação; plugins Scheduler/Premium não fazem parte da arquitetura atual.
+
+- localização, botões e datas permanecem em português do Brasil;
+- controles usam azul principal `#0051F5`, foco ciano `#2BD9FB`, bordas e superfícies dos tokens globais;
+- rascunhos usam alerta `#F59E0B`, cancelados usam erro `#EF4444` com texto riscado e opacidade reduzida;
+- o seletor Ano/Mês/Semana/Dia/Lista fica fora da toolbar interna para evitar quebra em telas estreitas;
+- eventos só exibem affordance de arrastar ou redimensionar quando a API informa permissão de edição;
+- selecionar um período inicia o cadastro, clicar abre detalhes e uma falha no backend restaura imediatamente a posição anterior;
+- cores nunca substituem os rótulos de tipo, status e visibilidade nos detalhes e legendas.
+
 ## Estados de interação
 
 - **Hover:** botões e links reforçam a ação com `brand-primary-hover`, `surface-muted` ou borda `brand-sky`, conforme a sua hierarquia; não usam mudanças bruscas de layout.
@@ -79,6 +91,6 @@ Todo elemento interativo deve preservar foco visível em ciano, rótulos acessí
 
 O Flowbite livre é instalado pelo npm e integrado ao Vite/Tailwind, exclusivamente para comportamentos e componentes compatíveis com esta linguagem visual. Componentes Pro, CDN em produção e estilos globais que substituam os tokens do Genesis+ não são permitidos.
 
-Máscaras de campos são implementadas com `IMask`, empacotado pelo Vite. Todo novo campo monetário deve usar `data-currency-input`: a interface apresenta `R$ 10,00` e o JavaScript envia o valor numérico normalizado ao backend. A validação no servidor continua obrigatória.
+Máscaras de campos são implementadas com `IMask`, empacotado pelo Vite. Todo novo campo monetário deve usar `data-currency-input`: a interface apresenta `R$ 10,00` e o JavaScript envia o valor numérico normalizado ao backend. Campos de hora devem usar `data-time-24`, `type="text"` e `inputmode="numeric"`, exibindo `HH:mm` em 24 horas e nunca AM/PM. A validação no servidor continua obrigatória.
 
 Todos os campos simples de data usam Flatpickr como padrão global (`resources/js/date-inputs.js`), com calendário e valor alternativo em português do Brasil (`dd/mm/aaaa`). O valor submetido continua sendo `YYYY-MM-DD`; novos campos de data devem usar `type="date"` para aderir automaticamente ao padrão.

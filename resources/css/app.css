@@ -228,3 +228,37 @@
         animation-iteration-count: 1 !important;
     }
 }
+
+[data-calendar-shell] {
+    --fc-monarch-primary: #0051f5;
+    --fc-monarch-primary-foreground: #ffffff;
+    --fc-monarch-primary-over: #0046d5;
+    --fc-monarch-primary-down: #003bb5;
+    --fc-monarch-secondary: #e8f1ff;
+    --fc-monarch-secondary-foreground: #0040c7;
+    --fc-monarch-secondary-over: #d9e9ff;
+    --fc-monarch-secondary-down: #c9dfff;
+    --fc-monarch-highlight: rgb(43 217 251 / 18%);
+    --fc-monarch-now: #ef4444;
+    --fc-monarch-outline: #2bd9fb;
+    --fc-monarch-background: #ffffff;
+    --fc-monarch-foreground: #0f172a;
+    --fc-monarch-border: #dbe7f7;
+    --fc-monarch-strong-border: #bfd2ea;
+}
+
+[data-calendar] {
+    min-height: 34rem;
+}
+
+[data-calendar] .calendar-event-cancelled {
+    opacity: 0.68;
+    text-decoration: line-through;
+}
+
+@media (max-width: 47.99rem) {
+    [data-calendar] {
+        min-height: 28rem;
+        font-size: 0.82rem;
+    }
+}

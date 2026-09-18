@@ -17,6 +17,7 @@ it('shows the implemented categories and routes to a global administrator', func
     $administrator = User::factory()->globalAdministrator()->create();
 
     $this->actingAs($administrator)->get(route('dashboard'))->assertOk()
+        ->assertSee('Agenda')->assertSee('href="'.route('calendar.index').'"', false)
         ->assertSee('Cadastros')->assertSee('Área e Igrejas')->assertSee('Membros')
         ->assertSee('Administração')->assertSee('Usuários')->assertSee('Cargos e permissões')->assertSee('Departamentos')->assertSee('Auditoria')
         ->assertSee('href="'.route('positions.index').'"', false)
@@ -25,6 +26,13 @@ it('shows the implemented categories and routes to a global administrator', func
         ->assertSee('Financeiro')->assertSee('Visão financeira')->assertSee('Movimentações')
         ->assertSee('href="'.route('finance.overview.index').'"', false)
         ->assertSee('href="'.route('finance.transactions.index').'"', false);
+});
+
+it('marks the agenda as active in the principal navigation', function () {
+    $administrator = User::factory()->globalAdministrator()->create();
+
+    $content = $this->actingAs($administrator)->get(route('calendar.index'))->assertOk()->getContent();
+    expect($content)->toMatch('/href="'.preg_quote(route('calendar.index'), '/').'"[^>]*aria-current="page"/');
 });
 
 it('keeps each administration item active only on its own routes', function () {

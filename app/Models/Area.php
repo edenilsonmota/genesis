@@ -43,6 +43,11 @@ class Area extends Model
         return $this->hasMany(FinancialCategory::class);
     }
 
+    public function calendarEventTypes(): HasMany
+    {
+        return $this->hasMany(CalendarEventType::class);
+    }
+
     protected function name(): Attribute
     {
         return Attribute::make(

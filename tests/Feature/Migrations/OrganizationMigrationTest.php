@@ -21,6 +21,7 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         '2026_09_14_000215_add_default_marker_to_financial_accounts_table.php',
         '2026_09_14_002304_seed_default_financial_categories_for_existing_areas.php',
         '2026_09_14_005604_make_church_details_optional.php',
+        '2026_09_18_000100_create_calendar_events_table.php',
     ];
     $migrations = collect($files)->map(fn (string $file) => require database_path('migrations/'.$file));
 
@@ -39,6 +40,7 @@ it('rolls back and reapplies the complete domain migrations in dependency order'
         ->and(Schema::hasTable('financial_categories'))->toBeTrue()
         ->and(Schema::hasTable('financial_transactions'))->toBeTrue()
         ->and(Schema::hasTable('financial_movements'))->toBeTrue()
+        ->and(Schema::hasTable('calendar_events'))->toBeTrue()
         ->and(DB::table('pg_constraint')->whereIn('conname', ['departments_name_uppercase_check', 'positions_name_uppercase_check'])->count())->toBe(2)
         ->and(DB::table('pg_indexes')->where('indexname', 'areas_singleton_unique')->exists())->toBeTrue();
 });

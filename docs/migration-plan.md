@@ -21,6 +21,9 @@ O projeto não possui dados legados a preservar. Após confirmação explícita,
 15. `audit_logs`.
 16. `financial_accounts`, com proprietário exclusivo entre área e igreja;
 17. `financial_categories`, pertencentes à área.
+18. `financial_transactions`, com o ciclo de status e referências gerenciais;
+19. `financial_movements`, livro de entradas e saídas por conta;
+20. `calendar_events`, pertencentes à área e opcionalmente a uma igreja, departamento e responsável.
 
 ## Integridade
 
@@ -31,6 +34,7 @@ O projeto não possui dados legados a preservar. Após confirmação explícita,
 - Relações históricas usam exclusão restrita. Somente linhas técnicas de permissão usam cascade a partir do cargo ou módulo.
 - A matriz garante uma linha por combinação de cargo e módulo.
 - Contas financeiras possuem constraint XOR de proprietário, índices funcionais de nome por área ou igreja e um único caixa padrão por escopo; categorias possuem unicidade funcional por área, tipo e nome.
+- Eventos exigem término posterior ao início; visibilidade departamental exige departamento e toda relação histórica usa exclusão restrita.
 
 O rollback de validação ocorre na ordem inversa: auditoria, matriz, atribuições, cargos, departamentos, vínculos, igrejas e restrição singleton. A suíte executa migrations em banco PostgreSQL de teste limpo.
 

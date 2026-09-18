@@ -116,6 +116,30 @@ class PermissionService
             || ($user->isActive() && $this->availableChurchesQuery($user)->whereKey($church->id)->exists());
     }
 
+    /** @return Collection<int, string> */
+    public function activeDepartmentIds(User $user, Church $church): Collection
+    {
+        if ($user->isGlobalAdministrator()) {
+            return DB::table('departments')
+                ->where('area_id', $church->area_id)
+                ->where('status', Status::Active->value)
+                ->pluck('id');
+        }
+
+        return $this->eligibleAssignmentsQuery($user, $church)
+            ->whereNotNull('positions.department_id')
+            ->distinct()
+            ->pluck('positions.department_id');
+    }
+
+    public function hasActiveDepartmentAssignment(User $user, Church $church, string $departmentId): bool
+    {
+        return $user->isGlobalAdministrator()
+            || $this->eligibleAssignmentsQuery($user, $church)
+                ->where('positions.department_id', $departmentId)
+                ->exists();
+    }
+
     /** @return Collection<int, Church> */
     public function churchesWithPermission(User $user, string $moduleKey, PermissionLevel $level): Collection
     {

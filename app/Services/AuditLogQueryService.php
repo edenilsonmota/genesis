@@ -42,7 +42,7 @@ class AuditLogQueryService
                 ->orWhere(fn (Builder $query): Builder => $query
                     ->where('scope_type', 'area')
                     ->where('scope_id', $church->area_id)
-                    ->whereIn('resource', ['areas', 'positions', 'departments', 'financial_categories']))
+                    ->whereIn('resource', ['areas', 'positions', 'departments', 'calendar_events', 'calendar_event_types', 'financial_categories']))
                 ->orWhere(fn (Builder $query): Builder => $query
                     ->where('resource', 'members')
                     ->whereIn('record_id', DB::table('member_church_memberships')
@@ -117,6 +117,11 @@ class AuditLogQueryService
         'user.profile_updated' => 'Perfil atualizado',
         'user.username_updated' => 'Nome de usuário atualizado',
         'user.password_changed' => 'Senha alterada',
+        'calendar_event.created' => 'Evento criado',
+        'calendar_event.updated' => 'Evento atualizado',
+        'calendar_event.rescheduled' => 'Evento reagendado',
+        'calendar_event.cancelled' => 'Evento cancelado',
+        'calendar_event_type.created' => 'Tipo de evento criado',
         'financial_category.created_from_transaction' => 'Categoria financeira criada',
         'financial_transaction.created' => 'Movimentação criada',
         'financial_transaction.transfer_created' => 'Transferência criada',
@@ -140,6 +145,8 @@ class AuditLogQueryService
         'departments' => 'Departamento',
         'positions' => 'Cargo',
         'users' => 'Usuário',
+        'calendar_events' => 'Evento da agenda',
+        'calendar_event_types' => 'Tipo de evento',
         'financial_categories' => 'Categoria financeira',
         'financial_transactions' => 'Movimentação financeira',
     ];

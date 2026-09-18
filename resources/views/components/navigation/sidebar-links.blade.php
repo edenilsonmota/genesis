@@ -2,6 +2,7 @@
 
 @php
     $canViewDashboard = auth()->user()->can('view-dashboard');
+    $canViewCalendar = app(App\Services\PermissionService::class)->can(auth()->user(), 'calendar', App\PermissionLevel::Read);
     $canViewOrganization = auth()->user()->can('viewAny', App\Models\Area::class);
     $canViewMembers = auth()->user()->can('viewAny', App\Models\Member::class);
     $canViewUsers = auth()->user()->can('viewAny', App\Models\User::class);
@@ -20,11 +21,19 @@
 @endphp
 
 <div class="grid gap-1" data-sidebar-links data-sidebar-context="{{ $context }}">
-    @if ($canViewDashboard)
+    @if ($canViewDashboard || $canViewCalendar)
         <p class="px-2.5 pb-2 text-[10px] font-semibold tracking-[0.14em] text-text-disabled uppercase" data-sidebar-category-heading>Principal</p>
+    @endif
+    @if ($canViewDashboard)
         <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('dashboard'), 'sidebar-item-idle' => ! request()->routeIs('dashboard')]) href="{{ route('dashboard') }}" data-sidebar-item @if(request()->routeIs('dashboard')) aria-current="page" @endif>
             <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z" /></svg>
             <span data-sidebar-text>Visão geral</span>
+        </a>
+    @endif
+    @if ($canViewCalendar)
+        <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('calendar.*'), 'sidebar-item-idle' => ! request()->routeIs('calendar.*')]) href="{{ route('calendar.index') }}" data-sidebar-item @if(request()->routeIs('calendar.*')) aria-current="page" @endif>
+            <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/><path d="M7 2v4m10-4v4M3 9h18M7 13h3m4 0h3m-10 4h3"/></svg>
+            <span data-sidebar-text>Agenda</span>
         </a>
     @endif
 

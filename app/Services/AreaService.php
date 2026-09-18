@@ -16,6 +16,7 @@ class AreaService
         private AuditService $audit,
         private DefaultFinancialAccountService $defaultFinancialAccounts,
         private FinancialCategoryProvisioningService $financialCategories,
+        private CalendarEventTypeService $calendarEventTypes,
     ) {}
 
     /**
@@ -36,6 +37,7 @@ class AreaService
                 $area = Area::query()->create($attributes);
                 $this->defaultFinancialAccounts->ensureForArea($area);
                 $this->financialCategories->ensureForArea($area);
+                $this->calendarEventTypes->ensureForArea($area);
                 $this->audit->record('area.created', 'areas', $area, 'area', $area->id, $area->only(['name', 'description', 'status']));
 
                 return $area;

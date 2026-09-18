@@ -14,6 +14,8 @@ Sistema web Laravel para gestão de igrejas, membros, cargos e acesso por permis
 
 Na sidebar, Administração contém **Usuários**, **Cargos e permissões**, **Departamentos** e **Auditoria**. Consulte [contexto de implementação](docs/genesis-implementation-context.md), [modelo de domínio](docs/genesis-domain-model.mmd), [plano de migrations](docs/migration-plan.md) e [identidade visual](docs/visual-identity.md).
 
+A **Agenda** usa FullCalendar com visões anual, mensal, semanal, diária e em lista, regras por igreja/departamento/privado e edição validada no backend. Consulte o [contexto da Agenda](docs/calendar/calendar-implementation-context.md).
+
 A fundação do módulo Financeiro está documentada separadamente em [contexto financeiro](docs/finance/financial-implementation-context.md), [modelo financeiro](docs/finance/financial-domain-model.mmd) e [roadmap financeiro](docs/finance/financial-roadmap.md).
 
 ## Desenvolvimento

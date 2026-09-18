@@ -52,6 +52,7 @@ Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias
 | Categoria | Chave | Tela/capacidade |
 | --- | --- | --- |
 | Principal | `dashboard` | Visão geral |
+| Principal | `calendar` | Agenda e eventos |
 | Cadastros | `areas` | Área administrativa |
 | Cadastros | `churches` | Igrejas |
 | Cadastros | `members` | Membros e vínculos |
@@ -61,6 +62,8 @@ Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias
 | Administração | `audit` | Auditoria |
 
 As capacidades `finance.overview`, `finance.transactions` e `finance.tithes` possuem telas próprias na categoria Financeiro; **Visão financeira** é a primeira opção. `finance.reports` permanece reservada para evolução futura. O contexto ativo limita os dados à igreja selecionada, enquanto **Visão geral** consolida todas as áreas e igrejas exclusivamente para o administrador global. O domínio e a evolução do módulo estão em [`docs/finance`](finance/financial-implementation-context.md).
+
+A categoria Principal apresenta **Visão geral** e **Agenda** conforme as permissões efetivas. A Agenda usa FullCalendar com ano, mês, semana, dia e lista, carrega eventos por uma rota JSON e aplica visibilidade e edição no backend. Seus tipos são um catálogo por área, pesquisável com Choices e extensível por modal para usuários com escrita. As decisões do módulo estão em [`docs/calendar`](calendar/calendar-implementation-context.md).
 
 A categoria Administração exibe, nesta ordem: Usuários, Cargos e permissões, Departamentos e Auditoria. A matriz exibida em um cargo usa as mesmas categorias dos módulos cadastrados.
 

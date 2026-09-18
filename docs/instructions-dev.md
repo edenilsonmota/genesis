@@ -72,7 +72,7 @@ Para gerar assets sem servidor de desenvolvimento:
 
 `migrate:fresh --seed` apaga o banco local; nunca o use contra producao.
 
-O frontend usa IMask para valores monetários e Flatpickr para datas. Ambos são dependências npm compiladas pelo Vite; não use CDN em produção nem calendários dependentes da localidade do navegador.
+O frontend usa IMask para valores monetários e horários, e Flatpickr para datas. São dependências npm compiladas pelo Vite; não use CDN em produção nem controles de data/hora dependentes da localidade do navegador. Datas seguem o padrão brasileiro (`dd/mm/aaaa`) nas interfaces. Horas de qualquer módulo usam sempre o formato de 24 horas (`HH:mm`), como `09:30` e `19:00`, sem AM/PM. Todo novo campo de horário deve usar `type="text"`, `inputmode="numeric"` e `data-time-24`; APIs e banco podem usar formatos técnicos, mas devem ser convertidos na interface.
 
 O Seeder de localidades usa o snapshot versionado
 `database/data/ibge-localities.json`. O comando de download consulta a API do

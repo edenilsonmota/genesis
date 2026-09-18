@@ -12,4 +12,7 @@ return [
     'dashboard' => [
         'overview_cache_seconds' => env('DASHBOARD_OVERVIEW_CACHE_SECONDS', 300),
     ],
+    'calendar' => [
+        'timezone' => env('CALENDAR_TIMEZONE', 'America/Sao_Paulo'),
+    ],
 ];
