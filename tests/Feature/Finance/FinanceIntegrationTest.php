@@ -35,14 +35,14 @@ it('shows financial capabilities in the position permission matrix', function ()
         ->assertSee('Dízimos');
 });
 
-it('hides the Finance category when only the archived movements permission is available', function () {
+it('shows only the movements item when its read permission is available', function () {
     $transactionReader = userWithPermission('finance.transactions', PermissionLevel::Read);
-    grantPermissionToUser($transactionReader, 'dashboard');
 
-    $this->actingAs($transactionReader)->get(route('dashboard'))
+    $this->actingAs($transactionReader)->get(route('finance.transactions.index'))
         ->assertOk()
-        ->assertDontSee('Financeiro')
-        ->assertDontSee('Movimentações')
+        ->assertSee('Financeiro')
+        ->assertSee('Movimentações')
+        ->assertSee('href="'.route('finance.transactions.index').'"', false)
         ->assertDontSee('Visão financeira')
         ->assertDontSee('Dízimos')
         ->assertDontSee('Relatórios');

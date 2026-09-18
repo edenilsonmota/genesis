@@ -77,7 +77,7 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
                 Route::post('/{financialTransaction}/reverse', [TitheController::class, 'reverse'])->name('reverse');
             });
             Route::prefix('transactions')->name('transactions.')->group(function (): void {
-                Route::redirect('/', '/finance/overview')->name('index');
+                Route::get('/', [FinancialTransactionController::class, 'index'])->name('index');
                 Route::get('/create', [FinancialTransactionController::class, 'create'])->name('create');
                 Route::post('/income', [FinancialTransactionController::class, 'storeIncome'])->name('income.store');
                 Route::post('/expenses', [FinancialTransactionController::class, 'storeExpense'])->name('expenses.store');

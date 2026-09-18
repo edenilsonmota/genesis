@@ -18,20 +18,6 @@
         <section class="ui-alert-error" role="alert"><ul class="list-disc pl-5">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></section>
     @endif
 
-    <section class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumo do período filtrado">
-        @foreach ([
-            ['label' => 'Entradas liquidadas', 'value' => $summary['inflows'], 'class' => 'text-success'],
-            ['label' => 'Saídas liquidadas', 'value' => $summary['outflows'], 'class' => 'text-danger'],
-            ['label' => 'Resultado', 'value' => $summary['result'], 'class' => (float) $summary['result'] < 0 ? 'text-danger' : 'text-brand-primary'],
-            ['label' => 'Total transferido', 'value' => $summary['transferred'], 'class' => 'text-info'],
-        ] as $item)
-            <article class="ui-card p-5">
-                <p class="text-xs font-semibold tracking-wide text-text-secondary uppercase">{{ $item['label'] }}</p>
-                <p class="mt-2 text-xl font-semibold {{ $item['class'] }}">R$ {{ number_format((float) $item['value'], 2, ',', '.') }}</p>
-            </article>
-        @endforeach
-    </section>
-
     <section class="ui-card overflow-hidden">
         <nav class="flex gap-1 overflow-x-auto border-b border-border-default p-3" aria-label="Tipos de movimentação">
             @foreach ([null => 'Todas', 'income' => 'Entradas', 'expense' => 'Saídas', 'transfer' => 'Transferências'] as $type => $label)

@@ -21,8 +21,9 @@ it('shows the implemented categories and routes to a global administrator', func
         ->assertSee('Administração')->assertSee('Usuários')->assertSee('Cargos e permissões')->assertSee('Departamentos')
         ->assertSee('href="'.route('positions.index').'"', false)
         ->assertSee('href="'.route('departments.index').'"', false)
-        ->assertSee('Financeiro')->assertSee('Visão financeira')->assertDontSee('Movimentações')
-        ->assertSee('href="'.route('finance.overview.index').'"', false);
+        ->assertSee('Financeiro')->assertSee('Visão financeira')->assertSee('Movimentações')
+        ->assertSee('href="'.route('finance.overview.index').'"', false)
+        ->assertSee('href="'.route('finance.transactions.index').'"', false);
 });
 
 it('keeps each administration item active only on its own routes', function () {
@@ -36,12 +37,12 @@ it('keeps each administration item active only on its own routes', function () {
     }
 });
 
-it('keeps the financial overview active in the Finance category', function () {
+it('keeps each finance item active only on its own routes', function () {
     $administrator = User::factory()->globalAdministrator()->create();
 
-    $content = $this->actingAs($administrator)->get(route('finance.overview.index'))->assertOk()->getContent();
+    $content = $this->actingAs($administrator)->get(route('finance.transactions.index'))->assertOk()->getContent();
     expect($content)->toMatch('/data-sidebar-category="finance"[^>]*aria-expanded="true"/')
-        ->toMatch('/href="'.preg_quote(route('finance.overview.index'), '/').'"[^>]*aria-current="page"/');
+        ->toMatch('/href="'.preg_quote(route('finance.transactions.index'), '/').'"[^>]*aria-current="page"/');
 });
 
 it('uses one navigation source with desktop hover expansion and mobile drawer', function () {
