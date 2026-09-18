@@ -38,6 +38,10 @@ class PermissionService
 
     public function currentChurch(User $user): ?Church
     {
+        if ($user->isGlobalAdministrator() && in_array(session('active_church_id'), [null, '__overview__'], true)) {
+            return null;
+        }
+
         $available = $this->availableChurches($user);
         $requestedId = session('active_church_id');
         $church = $available->firstWhere('id', $requestedId) ?? $available->first();

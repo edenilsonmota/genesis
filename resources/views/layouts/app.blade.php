@@ -38,6 +38,9 @@
                                 @method('PATCH')
                                 <label class="sr-only" for="active_church_id">Igreja ativa</label>
                                 <select class="ui-select w-auto max-w-[42vw] py-2 text-xs" id="active_church_id" name="church_id" onchange="this.form.submit()" aria-label="Igreja ativa" data-autosize-select data-select-min-width="7" data-select-max-width="28">
+                                    @if (auth()->user()->isGlobalAdministrator())
+                                        <option value="__overview__" @selected($activeChurch === null)>Visão geral</option>
+                                    @endif
                                     @foreach ($availableAccessChurches as $accessChurch)
                                         <option value="{{ $accessChurch->id }}" @selected(($activeChurch?->id ?? null) === $accessChurch->id)>{{ $accessChurch->name }}</option>
                                     @endforeach

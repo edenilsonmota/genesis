@@ -33,6 +33,12 @@ O `PermissionService` é a fonte central desse cálculo. Policies, Gates, middle
 
 O administrador global ativo ignora o contexto e as permissões por cargo. Sua conta não depende de membro, igreja ou cargo e não pode ser alterada pelos fluxos web comuns.
 
+### Contexto global e filtro de igrejas
+
+O seletor do cabeçalho é compartilhado por todas as telas autenticadas e representa o contexto organizacional da sessão. Usuários comuns veem exclusivamente as igrejas para as quais possuem membro ativo, vínculo e atribuição de cargo válidos na data atual, com cargo que concede acesso ao sistema. Portanto, uma conta vinculada somente à Igreja X não recebe no seletor nem nas telas dados da Igreja Y.
+
+O administrador global vê todas as igrejas ativas e dispõe também da opção **Visão geral**. Esse contexto não representa uma igreja: ele é reservado a consultas consolidadas, gráficos e telas administrativas futuras. Telas que exigem uma igreja específica devem solicitar ou impor esse escopo explicitamente; permissões e filtros do backend continuam sendo a fonte de verdade, jamais o seletor visual.
+
 ## Módulos e navegação
 
 Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias seguem a sidebar:

@@ -11,6 +11,12 @@ class ActiveChurchController extends Controller
 {
     public function update(Request $request, PermissionService $permissions): RedirectResponse
     {
+        if ($request->user()->isGlobalAdministrator() && $request->input('church_id') === '__overview__') {
+            $request->session()->put('active_church_id', '__overview__');
+
+            return back()->with('success', 'Visão geral selecionada.');
+        }
+
         $validated = $request->validate(['church_id' => ['required', 'uuid', 'exists:churches,id']]);
         $church = Church::query()->findOrFail($validated['church_id']);
 
