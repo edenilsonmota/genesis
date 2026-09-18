@@ -9,6 +9,16 @@ use App\Models\Position;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
+it('renders the responsive login composition with the institutional banner', function () {
+    $this->get(route('login'))
+        ->assertOk()
+        ->assertSee('images/login-banner.png')
+        ->assertSee('Pessoas, igrejas e propósito em um só lugar.')
+        ->assertSee('Acesse sua conta')
+        ->assertSee('data-password-toggle', false)
+        ->assertSee('aria-label="Mostrar senha"', false);
+});
+
 it('authenticates an active global administrator with username and password', function () {
     $user = User::factory()->globalAdministrator()->create(['username' => 'joao.silva', 'password' => Hash::make('Temporary123')]);
 

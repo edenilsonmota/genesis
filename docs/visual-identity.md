@@ -32,6 +32,7 @@ O gradiente institucional é `brand-gradient`: `linear-gradient(135deg, #2BD9FB 
 
 ## Componentes de interface
 
+- Login: em telas grandes usa composição dividida, com `public/images/login-banner.png` no painel esquerdo e formulário compacto no painel direito. A imagem recebe sobreposição escura para preservar contraste do logo e do texto; abaixo de `lg`, o painel visual é ocultado e o formulário ocupa a tela. O campo de senha oferece controle acessível para mostrar ou ocultar o conteúdo. A troca obrigatória de senha continua no layout centralizado para concentrar a atenção na ação de segurança.
 - Cards: usar `ui-card` para agrupar dados, tabelas e formulários. O raio é amplo, a sombra é discreta e a separação depende de `border-default`, não de cinzas arbitrários.
 - Campos: usar `ui-label`, `ui-input` e `ui-select`. Campos mantêm fundo claro, borda azul suave e foco visível em ciano. Erros usam `text-danger` e resumos usam `ui-alert-error`.
 - Botões: `ui-button-primary` para a ação principal da tela; `ui-button-secondary` para ações de menor ênfase; `ui-button-outline` para cancelar, voltar e ações neutras; `ui-button-danger` apenas para operações destrutivas ou de inativação.
