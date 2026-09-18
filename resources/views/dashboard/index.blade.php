@@ -52,6 +52,46 @@
         @endforeach
     </section>
 
+    @php $today = \Carbon\CarbonImmutable::today(config('genesis.calendar.timezone'))->locale('pt_BR'); @endphp
+    <section class="grid gap-5 lg:grid-cols-2">
+        <article class="ui-card overflow-hidden">
+            <div class="flex items-start justify-between gap-4 border-b border-border-default px-5 py-4 sm:px-6">
+                <div><h2 class="text-lg font-semibold text-text-primary">Aniversariantes de hoje</h2><p class="mt-1 text-sm text-text-secondary">Membros ativos{{ $overview['is_consolidated'] ? ' da área' : ' desta igreja' }}.</p></div>
+                <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-warning-soft text-warning" aria-hidden="true"><svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM8 10h.01M16 10h.01M8.5 15c1 .9 2.17 1.35 3.5 1.35S14.5 15.9 15.5 15"/></svg></span>
+            </div>
+            @forelse ($overview['birthdays'] as $birthday)
+                <div class="flex items-center gap-3 border-b border-border-default px-5 py-3.5 last:border-b-0 sm:px-6">
+                    <span class="grid size-9 shrink-0 place-items-center rounded-full bg-warning-soft text-sm font-bold text-warning" aria-hidden="true">{{ str($birthday['name'])->substr(0, 1)->upper() }}</span>
+                    <div class="min-w-0 flex-1"><p class="truncate font-semibold text-text-primary">{{ $birthday['name'] }}</p><p class="mt-0.5 text-xs text-text-secondary">Completa {{ $birthday['age'] }} {{ $birthday['age'] === 1 ? 'ano' : 'anos' }}</p></div>
+                    <span class="text-lg" aria-hidden="true">🎉</span>
+                </div>
+            @empty
+                <div class="px-6 py-10 text-center text-sm text-text-secondary">Não há aniversariantes neste escopo hoje.</div>
+            @endforelse
+        </article>
+
+        <article class="ui-card overflow-hidden">
+            <div class="flex items-start justify-between gap-4 border-b border-border-default px-5 py-4 sm:px-6">
+                <div><h2 class="text-lg font-semibold text-text-primary">Agenda de hoje</h2><p class="mt-1 text-sm text-text-secondary">{{ $today->translatedFormat('l, d \\d\\e F') }}.</p></div>
+                <span class="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-primary-soft text-center text-brand-primary" aria-hidden="true"><span class="text-base font-bold leading-none">{{ $today->format('d') }}</span><span class="mt-0.5 text-[9px] font-bold leading-none uppercase">{{ $today->translatedFormat('M') }}</span></span>
+            </div>
+            @if (! $overview['can_view_today_events'])
+                <div class="px-6 py-10 text-center text-sm text-text-secondary">Você não possui permissão para consultar os eventos deste escopo.</div>
+            @elseif ($overview['today_events'])
+                <ol class="divide-y divide-border-default">
+                    @foreach ($overview['today_events'] as $event)
+                        <li><a class="flex gap-3 px-5 py-3.5 transition hover:bg-surface-muted sm:px-6" href="{{ $event['url'] }}"><span class="mt-1 size-2.5 shrink-0 rounded-full {{ $event['status'] === 'Cancelado' ? 'bg-danger' : ($event['status'] === 'Rascunho' ? 'bg-warning' : 'bg-brand-primary') }}" aria-hidden="true"></span><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-3"><p class="truncate font-semibold text-text-primary">{{ $event['title'] }}</p><span class="shrink-0 text-xs font-semibold text-brand-primary">{{ $event['time'] }}</span></div><p class="mt-1 truncate text-xs text-text-secondary">{{ $event['type'] }} · {{ $event['scope'] }} · {{ $event['status'] }}</p></div></a></li>
+                    @endforeach
+                </ol>
+            @else
+                <div class="px-6 py-10 text-center text-sm text-text-secondary">Nenhum evento programado para hoje.</div>
+            @endif
+            @if ($overview['can_view_today_events'])
+                <div class="border-t border-border-default px-5 py-3 text-right sm:px-6"><a class="text-sm font-semibold text-brand-primary hover:text-brand-primary-hover" href="{{ route('calendar.index') }}">Abrir agenda →</a></div>
+            @endif
+        </article>
+    </section>
+
     <section class="grid gap-5 lg:grid-cols-3">
         <article class="ui-card min-w-0 overflow-hidden lg:col-span-2">
             <div class="border-b border-border-default px-5 py-4 sm:px-6">

@@ -4,33 +4,41 @@ namespace App\Services;
 
 use App\Models\Area;
 use App\Models\AuditLog;
+use App\Models\CalendarEvent;
 use App\Models\Church;
 use App\Models\Department;
 use App\Models\Member;
 use App\Models\Position;
 use App\Models\User;
+use App\PermissionLevel;
 use App\Status;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class DashboardOverviewService
 {
+    public function __construct(
+        private CalendarEventQueryService $calendarEvents,
+        private PermissionService $permissions,
+    ) {}
+
     /** @return array<string, mixed> */
-    public function forScope(?Church $church): array
+    public function forScope(?Church $church, User $actor): array
     {
         $scope = $church?->id ?? 'overview';
         $version = (int) Cache::get('dashboard-overview:version', 1);
 
         return Cache::remember(
-            "dashboard-overview:v{$version}:{$scope}",
+            "dashboard-overview:v{$version}:{$scope}:{$actor->id}",
             now()->addSeconds((int) config('genesis.dashboard.overview_cache_seconds', 300)),
-            fn (): array => $this->build($church),
+            fn (): array => $this->build($church, $actor),
         );
     }
 
     /** @return array<string, mixed> */
-    private function build(?Church $church): array
+    private function build(?Church $church, User $actor): array
     {
         $members = $this->members($church);
         $churches = Church::query()->active()->when($church, fn ($query) => $query->whereKey($church->id));
@@ -42,7 +50,7 @@ class DashboardOverviewService
         $churchCount = (clone $churches)->count();
 
         return [
-            'scope' => $church?->name ?? 'Visão geral',
+            'scope' => $church?->name ?? 'Área',
             'is_consolidated' => $church === null,
             'indicators' => [
                 'churches' => [
@@ -62,6 +70,9 @@ class DashboardOverviewService
             ],
             'members_by_church' => $this->membersByChurch($church),
             'activities' => $this->activities($church),
+            'birthdays' => $this->birthdaysToday($church),
+            'can_view_today_events' => $this->canViewTodayEvents($actor, $church),
+            'today_events' => $this->todayEvents($actor, $church),
             'structure' => [
                 'area_configured' => Area::query()->where('status', Status::Active->value)
                     ->when($church, fn ($query) => $query->whereKey($church->area_id))->exists(),
@@ -98,6 +109,72 @@ class DashboardOverviewService
         }
 
         return $query->count();
+    }
+
+    /** @return list<array{name: string, age: int}> */
+    private function birthdaysToday(?Church $church): array
+    {
+        $today = CarbonImmutable::today(config('genesis.calendar.timezone'));
+        $areaId = $church?->area_id ?? Area::query()->value('id');
+
+        return DB::table('members as m')
+            ->where('m.status', Status::Active->value)
+            ->whereNotNull('m.birth_date')
+            ->whereRaw('EXTRACT(MONTH FROM m.birth_date) = ?', [$today->month])
+            ->whereRaw('EXTRACT(DAY FROM m.birth_date) = ?', [$today->day])
+            ->whereExists(function (Builder $membership) use ($church, $areaId, $today): Builder {
+                return $membership->selectRaw('1')->from('member_church_memberships as mcm')
+                    ->join('churches as ch', 'ch.id', '=', 'mcm.church_id')
+                    ->whereColumn('mcm.member_id', 'm.id')
+                    ->where('mcm.status', Status::Active->value)
+                    ->where('ch.status', Status::Active->value)
+                    ->when($areaId, fn (Builder $query): Builder => $query->where('ch.area_id', $areaId))
+                    ->when($church, fn (Builder $query): Builder => $query->where('mcm.church_id', $church->id))
+                    ->whereDate('mcm.joined_at', '<=', $today)
+                    ->where(fn (Builder $query): Builder => $query->whereNull('mcm.ended_at')->orWhereDate('mcm.ended_at', '>=', $today));
+            })
+            ->orderBy('m.name')
+            ->limit(8)
+            ->get(['m.name', 'm.birth_date'])
+            ->map(fn (object $member): array => [
+                'name' => $member->name,
+                'age' => $today->year - CarbonImmutable::parse($member->birth_date)->year,
+            ])->all();
+    }
+
+    private function canViewTodayEvents(User $actor, ?Church $church): bool
+    {
+        return $actor->isGlobalAdministrator()
+            || ($church !== null && $this->permissions->can($actor, 'calendar', PermissionLevel::Read, $church));
+    }
+
+    /** @return list<array{title: string, type: string, time: string, scope: string, status: string, url: string}> */
+    private function todayEvents(User $actor, ?Church $church): array
+    {
+        if (! $this->canViewTodayEvents($actor, $church)) {
+            return [];
+        }
+
+        $timezone = config('genesis.calendar.timezone');
+        $start = CarbonImmutable::today($timezone);
+        $end = $start->addDay();
+
+        return $this->calendarEvents->visibleBetween($actor, $church, $start, $end)
+            ->orderBy('starts_at')
+            ->get()
+            ->map(function (CalendarEvent $event) use ($timezone): array {
+                $startsAt = $event->starts_at->setTimezone($timezone);
+                $endsAt = $event->ends_at->setTimezone($timezone);
+
+                return [
+                    'title' => $event->title,
+                    'type' => $event->eventType->name,
+                    'time' => $event->all_day ? 'Dia inteiro' : $startsAt->format('H:i').' – '.$endsAt->format('H:i'),
+                    'scope' => $event->church?->name ?? $event->area->name,
+                    'status' => $event->status->label(),
+                    'url' => route('calendar.events.show', $event),
+                ];
+            })->all();
     }
 
     private function effectiveMembership(Builder $query, Church $church): Builder

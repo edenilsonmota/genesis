@@ -20,7 +20,7 @@ class DashboardController extends Controller
         $church = $permissions->currentChurch($request->user());
 
         return view('dashboard.index', [
-            'overview' => $overview->forScope($church),
+            'overview' => $overview->forScope($church, $request->user()),
         ]);
     }
 }

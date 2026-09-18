@@ -37,11 +37,11 @@ O administrador global ativo ignora o contexto e as permissões por cargo. Sua c
 
 O seletor do cabeçalho é compartilhado por todas as telas autenticadas e representa o contexto organizacional da sessão. Usuários comuns veem exclusivamente as igrejas para as quais possuem membro ativo, vínculo e atribuição de cargo válidos na data atual, com cargo que concede acesso ao sistema. Portanto, uma conta vinculada somente à Igreja X não recebe no seletor nem nas telas dados da Igreja Y.
 
-O administrador global vê todas as igrejas ativas e dispõe também da opção **Visão geral**. Esse contexto não representa uma igreja: ele é reservado a consultas consolidadas, gráficos e telas administrativas futuras. Telas que exigem uma igreja específica devem solicitar ou impor esse escopo explicitamente; permissões e filtros do backend continuam sendo a fonte de verdade, jamais o seletor visual.
+O administrador global vê todas as igrejas ativas e dispõe também da opção **Área** no seletor do cabeçalho. Ela representa o conjunto de igrejas — não a tela **Visão geral** — e é reservada a consultas consolidadas, gráficos e telas administrativas futuras. Telas que exigem uma igreja específica devem solicitar ou impor esse escopo explicitamente; permissões e filtros do backend continuam sendo a fonte de verdade, jamais o seletor visual.
 
 ### Painel administrativo
 
-A rota `/dashboard` é a Visão geral administrativa. Ela apresenta igrejas e membros ativos, usuários com acesso efetivo, cargos e departamentos, atividades recentes, ações rápidas permitidas e o gráfico **Membros por igreja**. Não recebe gráficos financeiros: análises de entradas, saídas, dízimos e categorias permanecem em **Financeiro → Visão financeira**.
+A rota `/dashboard` é a Visão geral administrativa. Ela apresenta igrejas e membros ativos, usuários com acesso efetivo, cargos e departamentos, aniversariantes do dia, agenda de hoje, atividades recentes, ações rápidas permitidas e o gráfico **Membros por igreja**. Aniversariantes e eventos respeitam a igreja ativa ou o consolidado da Área; eventos também obedecem à permissão e à visibilidade da Agenda. Não recebe gráficos financeiros: análises de entradas, saídas, dízimos e categorias permanecem em **Financeiro → Visão financeira**.
 
 No contexto **Visão geral**, exclusivo do administrador global, os dados são consolidados entre todas as igrejas. Com uma igreja ativa, indicadores, gráfico e atividades ficam restritos a ela; os atalhos também respeitam as policies existentes. Os agregados usam cache por cinco minutos no store padrão do Laravel, com Redis em produção, e a auditoria incrementa a versão do cache após alterações administrativas.
 

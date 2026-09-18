@@ -14,7 +14,7 @@ class ActiveChurchController extends Controller
         if ($request->user()->isGlobalAdministrator() && $request->input('church_id') === '__overview__') {
             $request->session()->put('active_church_id', '__overview__');
 
-            return back()->with('success', 'Visão geral selecionada.');
+            return back()->with('success', 'Área selecionada.');
         }
 
         $validated = $request->validate(['church_id' => ['required', 'uuid', 'exists:churches,id']]);
