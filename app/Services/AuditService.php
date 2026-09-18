@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AuditLog;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -17,8 +18,9 @@ class AuditService
         ?string $scopeType = null,
         ?string $scopeId = null,
         array $details = [],
+        ?User $actor = null,
     ): AuditLog {
-        $actor = auth()->user();
+        $actor ??= auth()->user();
 
         $log = AuditLog::query()->create([
             'actor_user_id' => $actor?->id,

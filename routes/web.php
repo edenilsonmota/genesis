@@ -16,6 +16,7 @@ use App\Http\Controllers\Finance\FinancialOverviewController;
 use App\Http\Controllers\Finance\FinancialTransactionController;
 use App\Http\Controllers\Finance\TitheController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\MemberImportController;
 use App\Http\Controllers\MemberMembershipController;
 use App\Http\Controllers\MemberPositionAssignmentController;
 use App\Http\Controllers\OrganizationController;
@@ -66,6 +67,17 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
             ->only(['index', 'create', 'store', 'show', 'edit', 'update']);
         Route::patch('/members/{member}/inactivate', [MemberController::class, 'inactivate'])
             ->name('members.inactivate');
+
+        Route::prefix('members-import')->name('members-import.')->group(function (): void {
+            Route::get('/', [MemberImportController::class, 'index'])->name('index');
+            Route::post('/', [MemberImportController::class, 'store'])->name('store');
+            Route::get('/templates/new', [MemberImportController::class, 'blankTemplate'])->name('templates.blank');
+            Route::get('/templates/update', [MemberImportController::class, 'updateTemplate'])->name('templates.update');
+            Route::get('/{memberImport}', [MemberImportController::class, 'show'])->name('show');
+            Route::get('/{memberImport}/original', [MemberImportController::class, 'original'])->name('original');
+            Route::get('/{memberImport}/errors', [MemberImportController::class, 'errorReport'])->name('errors');
+            Route::post('/{memberImport}/confirm', [MemberImportController::class, 'confirm'])->name('confirm');
+        });
 
         Route::prefix('users')->name('users.')->group(function (): void {
             Route::get('/', [UserController::class, 'index'])->name('index');

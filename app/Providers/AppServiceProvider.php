@@ -8,6 +8,7 @@ use App\Models\Church;
 use App\Models\Department;
 use App\Models\FinancialTransaction;
 use App\Models\Member;
+use App\Models\MemberImport;
 use App\Models\Position;
 use App\Models\User;
 use App\PermissionLevel;
@@ -16,6 +17,7 @@ use App\Policies\CalendarEventPolicy;
 use App\Policies\ChurchPolicy;
 use App\Policies\DepartmentPolicy;
 use App\Policies\FinancialTransactionPolicy;
+use App\Policies\MemberImportPolicy;
 use App\Policies\MemberPolicy;
 use App\Policies\PositionPolicy;
 use App\Policies\UserPolicy;
@@ -23,6 +25,7 @@ use App\Services\PermissionService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use LogicException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +42,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->isProduction() && config('queue.default') === 'sync') {
+            throw new LogicException('O driver de fila sync não é permitido em produção. Configure QUEUE_CONNECTION=redis.');
+        }
+
         Model::preventLazyLoading(! $this->app->isProduction());
 
         Gate::define(
@@ -57,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(FinancialTransaction::class, FinancialTransactionPolicy::class);
         Gate::policy(Position::class, PositionPolicy::class);
         Gate::policy(Member::class, MemberPolicy::class);
+        Gate::policy(MemberImport::class, MemberImportPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
 
         Gate::define(

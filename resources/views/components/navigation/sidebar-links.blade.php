@@ -5,6 +5,7 @@
     $canViewCalendar = app(App\Services\PermissionService::class)->can(auth()->user(), 'calendar', App\PermissionLevel::Read);
     $canViewOrganization = auth()->user()->can('viewAny', App\Models\Area::class);
     $canViewMembers = auth()->user()->can('viewAny', App\Models\Member::class);
+    $canViewMemberImports = auth()->user()->can('viewAny', App\Models\MemberImport::class);
     $canViewUsers = auth()->user()->can('viewAny', App\Models\User::class);
     $canViewPositions = auth()->user()->can('viewAny', App\Models\Position::class);
     $canViewDepartments = auth()->user()->can('viewAny', App\Models\Department::class);
@@ -12,7 +13,7 @@
     $canViewFinancialTransactions = auth()->user()->can('viewAny', App\Models\FinancialTransaction::class);
     $canViewFinancialOverview = app(App\Services\PermissionService::class)->can(auth()->user(), 'finance.overview', App\PermissionLevel::Read);
     $canViewTithes = app(App\Services\PermissionService::class)->can(auth()->user(), 'finance.tithes', App\PermissionLevel::Read);
-    $registrationsActive = request()->routeIs('organization.*') || request()->routeIs('members.*');
+    $registrationsActive = request()->routeIs('organization.*') || request()->routeIs('members.*') || request()->routeIs('members-import.*');
     $administrationActive = request()->routeIs('users.*') || request()->routeIs('positions.*') || request()->routeIs('departments.*') || request()->routeIs('audit.*');
     $financeActive = request()->routeIs('finance.*');
     $registrationsId = 'sidebar-registrations-'.$context;
@@ -37,7 +38,7 @@
         </a>
     @endif
 
-    @if ($canViewOrganization || $canViewMembers)
+    @if ($canViewOrganization || $canViewMembers || $canViewMemberImports)
         <div class="relative mt-6">
             <button class="sidebar-category-toggle" type="button" data-sidebar-category-toggle data-sidebar-category="registrations" data-sidebar-context="{{ $context }}" aria-controls="{{ $registrationsId }}" aria-expanded="{{ $registrationsActive ? 'true' : 'false' }}">
                 <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5h4l2 2h7A2.5 2.5 0 0 1 21 9.5v7a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16.5v-9Z" /></svg>
@@ -54,6 +55,11 @@
             @if ($canViewMembers)
                 <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('members.*'), 'sidebar-item-idle' => ! request()->routeIs('members.*')]) href="{{ route('members.index') }}" data-sidebar-item @if(request()->routeIs('members.*')) aria-current="page" @endif>
                     <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M16 20v-1.5a4.5 4.5 0 0 0-4.5-4.5h-4A4.5 4.5 0 0 0 3 18.5V20m14-6a4 4 0 1 0 0-8m-7.5 4a3.5 3.5 0 1 0-7 0 3.5 3.5 0 0 0 7 0Z" /></svg><span data-sidebar-text>Membros</span>
+                </a>
+            @endif
+            @if ($canViewMemberImports)
+                <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('members-import.*'), 'sidebar-item-idle' => ! request()->routeIs('members-import.*')]) href="{{ route('members-import.index') }}" data-sidebar-item @if(request()->routeIs('members-import.*')) aria-current="page" @endif>
+                    <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0-12 4 4m-4-4L8 7M5 13v6h14v-6" /></svg><span data-sidebar-text>Importação de membros</span>
                 </a>
             @endif
         </div>

@@ -32,6 +32,7 @@ class PermissionModuleSeeder extends Seeder
             'dashboard' => ['name' => 'Painel', 'description' => 'Acesso ao painel inicial.', 'category' => 'Principal'],
             'calendar' => ['name' => 'Agenda', 'description' => 'Consulta e gestão de eventos da agenda.', 'category' => 'Principal'],
             'members' => ['name' => 'Membros', 'description' => 'Gestão de membros.', 'category' => 'Cadastros'],
+            'members.import' => ['name' => 'Importação de membros', 'description' => 'Consulta e processamento de importações de membros por Excel.', 'category' => 'Cadastros'],
             'users' => ['name' => 'Usuários', 'description' => 'Gestão de contas de acesso.', 'category' => 'Administração'],
             'positions' => ['name' => 'Cargos e permissões', 'description' => 'Gestão de cargos e das permissões que eles concedem.', 'category' => 'Administração'],
             'areas' => ['name' => 'Áreas', 'description' => 'Gestão de áreas administrativas.', 'category' => 'Cadastros'],

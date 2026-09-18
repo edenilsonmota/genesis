@@ -56,6 +56,7 @@ Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias
 | Cadastros | `areas` | Área administrativa |
 | Cadastros | `churches` | Igrejas |
 | Cadastros | `members` | Membros e vínculos |
+| Cadastros | `members.import` | Importação de membros por Excel |
 | Administração | `users` | Usuários |
 | Administração | `positions` | Cargos e permissões |
 | Administração | `departments` | Departamentos |
@@ -66,6 +67,10 @@ As capacidades `finance.overview`, `finance.transactions` e `finance.tithes` pos
 A categoria Principal apresenta **Visão geral** e **Agenda** conforme as permissões efetivas. A Agenda usa FullCalendar com ano, mês, semana, dia e lista, carrega eventos por uma rota JSON e aplica visibilidade e edição no backend. Seus tipos são um catálogo por área, pesquisável com Choices e extensível por modal para usuários com escrita. As decisões do módulo estão em [`docs/calendar`](calendar/calendar-implementation-context.md).
 
 A categoria Administração exibe, nesta ordem: Usuários, Cargos e permissões, Departamentos e Auditoria. A matriz exibida em um cargo usa as mesmas categorias dos módulos cadastrados.
+
+### Importação de membros
+
+O módulo de importação usa planilhas `.xlsx`, armazenamento privado e dois Jobs na fila Redis `imports`: validação sem mutação e processamento após confirmação explícita. O escopo é sempre uma igreja autorizada, a importação é atômica por arquivo e a exportação preenchida exige também leitura de membros. Detalhes de formato, segurança e operação estão em [`docs/members-import`](members-import/member-import-implementation-context.md).
 
 ## Fluxos
 

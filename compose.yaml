@@ -24,6 +24,25 @@ services:
         depends_on:
             - pgsql
             - redis
+    queue:
+        build:
+            context: './vendor/laravel/sail/runtimes/8.5'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: 'sail-8.5/app'
+        restart: unless-stopped
+        command: php artisan queue:work redis --queue=imports,default --sleep=1 --tries=3 --timeout=600 --max-time=3600
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - pgsql
+            - redis
     pgsql:
         image: 'postgres:18-alpine'
         ports:

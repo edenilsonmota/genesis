@@ -70,6 +70,14 @@ Para gerar assets sem servidor de desenvolvimento:
 ./vendor/bin/sail down
 ```
 
+O Compose também inicia o serviço `queue`, que executa Redis nas filas `imports,default`. Para acompanhar somente o worker:
+
+```bash
+./vendor/bin/sail logs -f queue
+```
+
+Não use `QUEUE_CONNECTION=sync` em produção. Importações de membros dependem do processamento fora da requisição HTTP; mantenha `REDIS_QUEUE_RETRY_AFTER=660`, acima do maior timeout de Job (600 segundos).
+
 `migrate:fresh --seed` apaga o banco local; nunca o use contra producao.
 
 O frontend usa IMask para valores monetários e horários, e Flatpickr para datas. São dependências npm compiladas pelo Vite; não use CDN em produção nem controles de data/hora dependentes da localidade do navegador. Datas seguem o padrão brasileiro (`dd/mm/aaaa`) nas interfaces. Horas de qualquer módulo usam sempre o formato de 24 horas (`HH:mm`), como `09:30` e `19:00`, sem AM/PM. Todo novo campo de horário deve usar `type="text"`, `inputmode="numeric"` e `data-time-24`; APIs e banco podem usar formatos técnicos, mas devem ser convertidos na interface.

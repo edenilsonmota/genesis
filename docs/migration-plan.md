@@ -24,6 +24,8 @@ O projeto não possui dados legados a preservar. Após confirmação explícita,
 18. `financial_transactions`, com o ciclo de status e referências gerenciais;
 19. `financial_movements`, livro de entradas e saídas por conta;
 20. `calendar_events`, pertencentes à área e opcionalmente a uma igreja, departamento e responsável.
+21. `member_imports`, histórico de arquivos privados por igreja e usuários responsáveis.
+22. `member_import_rows`, prévia normalizada e erros por linha da importação.
 
 ## Integridade
 

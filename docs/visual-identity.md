@@ -78,7 +78,7 @@ A fonte única dos itens da navegação é `resources/views/components/navigatio
 
 - Em `lg` ou maior, a sidebar permanece compacta em 64px e expande para 224px ao receber hover ou foco do teclado. Não existe botão ou chevron exclusivo para expandir a sidebar; chevrons são reservados às categorias.
 - Recolhida, ela mostra o símbolo e os ícones centralizados; expandida, mostra o nome `Genesis+`, os rótulos e as categorias. O usuário permanece no topo direito do cabeçalho, nunca no rodapé da sidebar.
-- A categoria **Cadastros** é expansível e guarda a preferência em `genesis.sidebar.registrations.open`. Uma rota de Área e Igrejas ou Membros mantém a categoria aberta para evidenciar o contexto atual.
+- A categoria **Cadastros** é expansível e guarda a preferência em `genesis.sidebar.registrations.open`. Uma rota de Área e Igrejas, Membros ou Importação de membros mantém a categoria aberta para evidenciar o contexto atual.
 - A categoria **Administração** é expansível e guarda a preferência em `genesis.sidebar.administration.open`. Ela contém, nesta ordem, Usuários, Cargos e permissões, Departamentos e Auditoria. A matriz pertence à tela de cargos e sua taxonomia de módulos reproduz as categorias da sidebar.
 - A categoria **Financeiro** é expansível, guarda a preferência em `genesis.sidebar.finance.open` e exibe, nesta ordem e conforme a permissão, **Visão financeira**, **Movimentações** e **Dízimos**. Contas e categorias continuam como infraestrutura interna do domínio financeiro.
 - A sidebar e o drawer usam `surface-card` como fundo, com texto escuro, bordas suaves e estado ativo em `brand-primary-soft`. O gradiente institucional fica reservado aos destaques de conteúdo e às visualizações de dados previstas nesta identidade.

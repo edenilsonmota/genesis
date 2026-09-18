@@ -1,0 +1,39 @@
+erDiagram
+    CHURCHES ||--o{ MEMBER_IMPORTS : receives
+    USERS ||--o{ MEMBER_IMPORTS : uploads
+    USERS o|--o{ MEMBER_IMPORTS : confirms
+    MEMBER_IMPORTS ||--o{ MEMBER_IMPORT_ROWS : validates
+    MEMBERS o|--o{ MEMBER_IMPORT_ROWS : targets
+
+    MEMBER_IMPORTS {
+        uuid id PK
+        uuid church_id FK
+        uuid uploaded_by_user_id FK
+        uuid confirmed_by_user_id FK
+        varchar original_filename
+        varchar stored_filename
+        varchar file_path
+        char file_hash
+        integer total_rows
+        integer new_members_count
+        integer updates_count
+        integer errors_count
+        varchar status
+        timestamp validated_at
+        timestamp confirmed_at
+        timestamp processed_at
+        timestamp completed_at
+        timestamp failed_at
+        text failure_reason
+    }
+
+    MEMBER_IMPORT_ROWS {
+        uuid id PK
+        uuid member_import_id FK
+        integer row_number
+        varchar operation
+        uuid member_id FK
+        jsonb normalized_payload
+        jsonb errors
+        varchar status
+    }
