@@ -36,6 +36,7 @@ O gradiente institucional é `brand-gradient`: `linear-gradient(135deg, #2BD9FB 
 - Campos: usar `ui-label`, `ui-input` e `ui-select`. Campos mantêm fundo claro, borda azul suave e foco visível em ciano. Erros usam `text-danger` e resumos usam `ui-alert-error`.
 - Botões: `ui-button-primary` para a ação principal da tela; `ui-button-secondary` para ações de menor ênfase; `ui-button-outline` para cancelar, voltar e ações neutras; `ui-button-danger` apenas para operações destrutivas ou de inativação.
 - Badges: estados sempre incluem texto, além de cor. O componente `x-status-badge` é a fonte padrão para status de entidades.
+- Tooltips: para esclarecer termos ou ícones sem poluir o formulário, usar `x-tooltip` com texto breve e objetivo. Ele funciona ao passar o mouse e ao receber foco pelo teclado; não usar tooltip como única forma de apresentar uma instrução essencial.
 - Tabelas: cabeçalho com `surface-muted`, texto secundário e borda padrão; registros preservam contraste alto. Em telas pequenas, a informação deve migrar para cards em vez de forçar rolagem horizontal desnecessária.
 - Paginação: o template local usa a ação principal na página ativa, estados desabilitados legíveis e foco nítido.
 - Matriz de permissões por cargo: os módulos são agrupados exatamente pelas categorias da sidebar — **Principal**, **Cadastros**, **Administração** e **Financeiro** — e na mesma ordem. Cada registro representa uma tela/capacidade do backend e apresenta nome, descrição e as três escolhas mutuamente exclusivas — Sem acesso, Leitura e Escrita. A relação de chaves, telas e categorias está em `docs/genesis-implementation-context.md`.
@@ -65,3 +66,5 @@ A fonte única dos itens da navegação é `resources/views/components/navigatio
 Todo elemento interativo deve preservar foco visível em ciano, rótulos acessíveis e contraste suficiente. Ícones isolados precisam de `aria-label` ou texto alternativo; cores de status não podem ser o único sinal da informação. Respeitar `prefers-reduced-motion` e não criar transições que bloqueiem navegação por teclado.
 
 O Flowbite livre é instalado pelo npm e integrado ao Vite/Tailwind, exclusivamente para comportamentos e componentes compatíveis com esta linguagem visual. Componentes Pro, CDN em produção e estilos globais que substituam os tokens do Genesis+ não são permitidos.
+
+Máscaras de campos são implementadas com `IMask`, empacotado pelo Vite. Todo novo campo monetário deve usar `data-currency-input`: a interface apresenta `R$ 10,00` e o JavaScript envia o valor numérico normalizado ao backend. A validação no servidor continua obrigatória.

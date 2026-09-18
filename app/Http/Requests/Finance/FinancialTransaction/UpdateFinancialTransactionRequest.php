@@ -52,6 +52,8 @@ class UpdateFinancialTransactionRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $competence = (string) $this->input('competence_month', '');
+        $competenceNumber = (int) $this->input('competence_month_number', 0);
+        $competenceYear = (int) $this->input('competence_year', 0);
         $this->merge([
             'title' => Str::squish((string) $this->input('title')),
             'description' => filled($this->input('description')) ? trim((string) $this->input('description')) : null,
@@ -59,7 +61,9 @@ class UpdateFinancialTransactionRequest extends FormRequest
             'document_number' => filled($this->input('document_number')) ? Str::squish((string) $this->input('document_number')) : null,
             'department_id' => filled($this->input('department_id')) ? $this->input('department_id') : null,
             'responsible_member_id' => filled($this->input('responsible_member_id')) ? $this->input('responsible_member_id') : null,
-            'competence_month' => preg_match('/^\d{4}-\d{2}$/', $competence) === 1 ? $competence.'-01' : ($competence !== '' ? $competence : null),
+            'competence_month' => $competenceNumber >= 1 && $competenceNumber <= 12 && $competenceYear >= 2000 && $competenceYear <= 2100
+                ? sprintf('%d-%02d-01', $competenceYear, $competenceNumber)
+                : (preg_match('/^\d{4}-\d{2}$/', $competence) === 1 ? $competence.'-01' : ($competence !== '' ? $competence : null)),
         ]);
     }
 }

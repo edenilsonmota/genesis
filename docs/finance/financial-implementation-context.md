@@ -28,6 +28,8 @@ Uma transação representa o fato gerencial — entrada, despesa, transferência
 
 O usuário responsável pelo lançamento será preservado para rastreabilidade. Alterações relevantes usarão a auditoria existente. Cancelamentos e estornos serão operações explícitas que preservam histórico; registros financeiros confirmados não serão simplesmente apagados ou reescritos.
 
+Nos formulários de Movimentações, **Responsável** é o membro que responde ou acompanha o lançamento; **Contraparte** é a pessoa, empresa ou instituição do outro lado do pagamento ou recebimento. Ambos possuem tooltip objetivo na interface. Valores monetários usam IMask com apresentação em real brasileiro (`R$ 10,00`) e são normalizados antes da validação do backend.
+
 ## Dízimos e privacidade
 
 Dízimos possuem Controller e telas próprios, separados de Movimentações para oferecer um fluxo adequado à igreja. Essa separação é somente de interface: cada dízimo é uma entrada liquidada associada ao caixa padrão da igreja, possui data de recebimento e mês de referência, afeta o mesmo saldo e aparecerá nos relatórios consolidados.

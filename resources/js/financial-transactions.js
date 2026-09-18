@@ -20,6 +20,7 @@ const initializeFinancialTransactionForm = (form) => {
     const draftStatus = form.querySelector('[data-draft-status]');
     const paymentMethod = form.querySelector('#payment_method');
     const amount = form.querySelector('[data-transaction-amount]');
+    const responsible = form.querySelector('[data-responsible-select]');
     const negativeBalanceWarning = form.querySelector('[data-negative-balance-warning]');
     const quickTrigger = form.querySelector('[data-quick-category-trigger]');
     const modal = document.querySelector('[data-quick-category-modal]');
@@ -38,6 +39,15 @@ const initializeFinancialTransactionForm = (form) => {
         searchEnabled: true,
         searchFloor: 1,
         searchPlaceholderValue: 'Buscar categoria',
+        shouldSort: true,
+    }) : null;
+    const responsibleChoices = responsible ? new Choices(responsible, {
+        allowHTML: false,
+        itemSelectText: '',
+        noResultsText: 'Nenhum membro encontrado',
+        searchEnabled: true,
+        searchFloor: 1,
+        searchPlaceholderValue: 'Buscar responsável',
         shouldSort: true,
     }) : null;
     let searchTerm = '';
@@ -123,6 +133,7 @@ const initializeFinancialTransactionForm = (form) => {
         if (draftStatus) draftStatus.disabled = isTransfer;
         if (isTransfer && status?.value === 'draft') status.value = 'pending';
         if (paymentMethod) paymentMethod.required = isTransfer || status?.value !== 'draft';
+        if (responsibleChoices) isTransfer ? responsibleChoices.disable() : responsibleChoices.enable();
         updateOptions();
         updateNegativeBalanceWarning();
     };

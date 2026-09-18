@@ -11,6 +11,9 @@
     $standardMovement = $editing && $financialTransaction->type !== App\Enums\FinancialTransactionType::Transfer ? $financialTransaction->movements->first() : null;
     $sourceMovement = $editing ? $financialTransaction->movements->firstWhere('direction', App\Enums\FinancialMovementDirection::Outflow) : null;
     $destinationMovement = $editing ? $financialTransaction->movements->firstWhere('direction', App\Enums\FinancialMovementDirection::Inflow) : null;
+    $competenceMonth = old('competence_month_number', $editing && $financialTransaction->competence_month ? $financialTransaction->competence_month->month : '');
+    $competenceYear = old('competence_year', $editing && $financialTransaction->competence_month ? $financialTransaction->competence_month->year : '');
+    $months = [1 => 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 @endphp
 
 @unless ($editing)
@@ -35,7 +38,7 @@
     </div>
 @endunless
 
-<div class="grid gap-5 sm:grid-cols-2" data-standard-account-fields @if($typeValue === 'transfer') hidden @endif>
+<section class="grid gap-5 rounded-2xl border border-border-default/80 bg-surface-card p-5 sm:grid-cols-2 sm:p-6" data-standard-account-fields @if($typeValue === 'transfer') hidden @endif>
     <div class="sm:col-span-2">
         <label class="ui-label" for="account_id" data-account-label>{{ $typeValue === 'expense' ? 'Conta de origem' : 'Conta de destino' }}</label>
         <select class="ui-select" id="account_id" name="account_id" data-transaction-control data-account-select @disabled($typeValue === 'transfer')>
@@ -69,33 +72,41 @@
     </div>
 
     <div>
-        <label class="ui-label" for="responsible_member_id">Responsável</label>
-        <select class="ui-select" id="responsible_member_id" name="responsible_member_id" data-transaction-control @disabled($typeValue === 'transfer')>
+        <div class="flex items-center gap-1.5"><label class="ui-label" for="responsible_member_id">Responsável</label><x-tooltip id="responsible-member-tooltip" text="Membro que responde ou acompanha este lançamento. É opcional." /></div>
+        <select class="ui-select" id="responsible_member_id" name="responsible_member_id" data-transaction-control data-responsible-select @disabled($typeValue === 'transfer')>
             <option value="">Sem responsável</option>
             @foreach ($responsibleMembers as $member)
                 <option value="{{ $member->id }}" @selected(old('responsible_member_id', $financialTransaction->responsible_member_id ?? '') === $member->id)>{{ $member->name }}</option>
             @endforeach
         </select>
-        <p class="mt-1.5 text-xs text-text-secondary">O vínculo do membro com o escopo será validado no backend.</p>
     </div>
 
     <div>
-        <label class="ui-label" for="counterparty_name" data-counterparty-label>{{ $typeValue === 'expense' ? 'Favorecido ou fornecedor' : 'Contraparte' }}</label>
+        <div class="flex items-center gap-1.5"><label class="ui-label" for="counterparty_name" data-counterparty-label>{{ $typeValue === 'expense' ? 'Favorecido ou fornecedor' : 'Contraparte' }}</label><x-tooltip id="counterparty-tooltip" text="Pessoa, empresa ou instituição do outro lado do pagamento ou recebimento." /></div>
         <input class="ui-input" id="counterparty_name" name="counterparty_name" value="{{ old('counterparty_name', $financialTransaction->counterparty_name ?? '') }}" maxlength="255" data-transaction-control @disabled($typeValue === 'transfer')>
     </div>
 
     <div data-document-field @if($typeValue !== 'expense') hidden @endif>
-        <label class="ui-label" for="document_number">Número do documento</label>
+        <div class="flex items-center gap-1.5"><label class="ui-label" for="document_number">Número do documento</label><x-tooltip id="document-number-tooltip" text="Identifica o comprovante da saída, como nota fiscal, boleto, fatura, recibo ou comprovante bancário." /></div>
         <input class="ui-input" id="document_number" name="document_number" value="{{ old('document_number', $financialTransaction->document_number ?? '') }}" maxlength="255" data-transaction-control @disabled($typeValue !== 'expense')>
     </div>
 
     <div>
-        <label class="ui-label" for="competence_month">Competência</label>
-        <input class="ui-input" id="competence_month" name="competence_month" type="month" value="{{ old('competence_month', isset($financialTransaction) && $financialTransaction->competence_month ? $financialTransaction->competence_month->format('Y-m') : '') }}" data-transaction-control @disabled($typeValue === 'transfer')>
+        <div class="flex items-center gap-1.5"><label class="ui-label">Competência</label><x-tooltip id="competence-tooltip" text="Mês e ano aos quais este lançamento se refere. Pode ser diferente da data em que ele foi pago ou recebido." /></div>
+        <div class="grid grid-cols-[minmax(0,1fr)_7rem] gap-3">
+            <select class="ui-select" id="competence_month_number" name="competence_month_number" data-transaction-control @disabled($typeValue === 'transfer')>
+                <option value="">Mês</option>
+                @foreach ($months as $number => $name)<option value="{{ $number }}" @selected((int) $competenceMonth === $number)>{{ $name }}</option>@endforeach
+            </select>
+            <select class="ui-select" id="competence_year" name="competence_year" data-transaction-control @disabled($typeValue === 'transfer')>
+                <option value="">Ano</option>
+                @for ($year = today()->year - 10; $year <= today()->year; $year++)<option value="{{ $year }}" @selected((int) $competenceYear === $year)>{{ $year }}</option>@endfor
+            </select>
+        </div>
     </div>
-</div>
+</section>
 
-<div class="grid gap-5 sm:grid-cols-2" data-transfer-account-fields @if($typeValue !== 'transfer') hidden @endif>
+<section class="grid gap-5 rounded-2xl border border-border-default/80 bg-surface-card p-5 sm:grid-cols-2 sm:p-6" data-transfer-account-fields @if($typeValue !== 'transfer') hidden @endif>
     <div>
         <label class="ui-label" for="source_account_id">Conta de origem</label>
         <select class="ui-select" id="source_account_id" name="source_account_id" data-transfer-control @disabled($typeValue !== 'transfer')>
@@ -114,9 +125,9 @@
             @endforeach
         </select>
     </div>
-</div>
+</section>
 
-<div class="grid gap-5 sm:grid-cols-2">
+<section class="grid gap-5 rounded-2xl border border-border-default/80 bg-surface-card p-5 sm:grid-cols-2 sm:p-6">
     <div class="sm:col-span-2">
         <label class="ui-label" for="title">Título</label>
         <input class="ui-input" id="title" name="title" value="{{ old('title', $financialTransaction->title ?? '') }}" maxlength="255" required autofocus>
@@ -150,13 +161,13 @@
             </select>
         </div>
     @endunless
-</div>
+</section>
 
 <div class="hidden rounded-2xl border border-warning/20 bg-warning-soft p-4 text-sm text-warning" role="status" data-negative-balance-warning>
     Esta saída liquidada deixará a conta com saldo negativo. A operação é permitida, mas revise os lançamentos históricos.
 </div>
 
-<div>
+<section class="rounded-2xl border border-border-default/80 bg-surface-card p-5 sm:p-6">
     <label class="ui-label" for="description">Descrição</label>
     <textarea class="ui-input min-h-28" id="description" name="description" maxlength="4000">{{ old('description', $financialTransaction->description ?? '') }}</textarea>
-</div>
+</section>
