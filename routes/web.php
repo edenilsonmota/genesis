@@ -8,6 +8,7 @@ use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\Finance\FinancialTransactionController;
+use App\Http\Controllers\Finance\TitheController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\MemberMembershipController;
 use App\Http\Controllers\MemberPositionAssignmentController;
@@ -66,6 +67,12 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
         Route::put('/positions/{position}/permissions', [PositionController::class, 'updatePermissions'])->name('positions.permissions.update');
 
         Route::prefix('finance')->name('finance.')->group(function (): void {
+            Route::prefix('tithes')->name('tithes.')->group(function (): void {
+                Route::get('/', [TitheController::class, 'index'])->name('index');
+                Route::post('/', [TitheController::class, 'store'])->name('store');
+                Route::get('/{financialTransaction}', [TitheController::class, 'show'])->name('show');
+                Route::patch('/{financialTransaction}/details', [TitheController::class, 'updateDetails'])->name('details.update');
+            });
             Route::prefix('transactions')->name('transactions.')->group(function (): void {
                 Route::get('/', [FinancialTransactionController::class, 'index'])->name('index');
                 Route::get('/create', [FinancialTransactionController::class, 'create'])->name('create');

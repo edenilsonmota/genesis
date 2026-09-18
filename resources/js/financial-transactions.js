@@ -1,4 +1,5 @@
 import Choices from 'choices.js';
+import { currencyValue } from './currency-inputs';
 
 const normalize = (value) => value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
 
@@ -90,7 +91,7 @@ const initializeFinancialTransactionForm = (form) => {
     const updateNegativeBalanceWarning = () => {
         if (!negativeBalanceWarning) return;
         const balance = Number(account?.selectedOptions[0]?.dataset.balance || 0);
-        const value = Number(amount?.value || 0);
+        const value = amount ? currencyValue(amount) : 0;
         negativeBalanceWarning.classList.toggle('hidden', selectedType !== 'expense' || value <= balance);
     };
 

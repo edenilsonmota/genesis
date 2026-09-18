@@ -1,0 +1,21 @@
+@extends('layouts.app')
+
+@section('title', 'Detalhes do dízimo')
+@section('header', 'Dízimos')
+
+@section('content')
+    <div class="mx-auto grid max-w-3xl gap-7">
+        <header class="flex flex-wrap items-end justify-between gap-4"><div><p class="ui-page-kicker">Financeiro</p><h1 class="mt-1 ui-page-title">Detalhes do dízimo</h1><p class="mt-2 ui-page-copy">Recebimento de {{ $financialTransaction->member->name }}.</p></div><a class="ui-button-outline" href="{{ route('finance.tithes.index', ['reference_month' => $financialTransaction->competence_month->month, 'reference_year' => $financialTransaction->competence_month->year]) }}">Voltar</a></header>
+        <section class="ui-card overflow-hidden"><dl class="grid divide-y divide-border-default sm:grid-cols-2 sm:divide-x sm:divide-y-0"><div class="p-6"><dt class="text-xs font-semibold tracking-wide text-text-secondary uppercase">Valor</dt><dd class="mt-2 text-xl font-semibold text-success">R$ {{ number_format((float) $financialTransaction->amount, 2, ',', '.') }}</dd></div><div class="p-6"><dt class="text-xs font-semibold tracking-wide text-text-secondary uppercase">Data de pagamento</dt><dd class="mt-2 font-semibold text-text-primary">{{ $financialTransaction->occurred_on->format('d/m/Y') }}</dd></div></dl><div class="border-t border-border-default p-6"><p class="text-xs font-semibold tracking-wide text-text-secondary uppercase">Mês/ano de referência</p><p class="mt-2 font-semibold text-text-primary">{{ $financialTransaction->competence_month->format('m/Y') }}</p></div></section>
+        @can('global-administrator')
+            @php $canEditDetails = true; @endphp
+        @else
+            @php $canEditDetails = app(App\Services\PermissionService::class)->can(auth()->user(), 'finance.tithes', App\PermissionLevel::Write, $church); @endphp
+        @endcan
+        @if ($canEditDetails)
+            <form class="ui-card grid gap-5 p-6 sm:p-8" method="POST" action="{{ route('finance.tithes.details.update', $financialTransaction) }}">@csrf @method('PATCH')<div><label class="ui-label" for="payment_method">Forma de pagamento</label><select class="ui-select" id="payment_method" name="payment_method" required>@foreach(App\Enums\FinancialPaymentMethod::cases() as $method)<option value="{{ $method->value }}" @selected(old('payment_method', $financialTransaction->payment_method?->value) === $method->value)>{{ $method->label() }}</option>@endforeach</select></div><div><label class="ui-label" for="description">Observação</label><textarea class="ui-input min-h-28" id="description" name="description">{{ old('description', $financialTransaction->description) }}</textarea></div><div><button class="ui-button-primary" type="submit">Salvar detalhes</button></div></form>
+        @else
+            <section class="ui-card p-6"><p class="text-xs font-semibold tracking-wide text-text-secondary uppercase">Forma de pagamento</p><p class="mt-2 font-semibold text-text-primary">{{ $financialTransaction->payment_method?->label() ?? 'Não informada' }}</p><p class="mt-5 text-xs font-semibold tracking-wide text-text-secondary uppercase">Observação</p><p class="mt-2 whitespace-pre-line text-sm text-text-primary">{{ $financialTransaction->description ?: 'Nenhuma observação informada.' }}</p></section>
+        @endif
+    </div>
+@endsection

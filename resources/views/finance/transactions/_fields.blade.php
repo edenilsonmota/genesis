@@ -123,7 +123,7 @@
     </div>
     <div>
         <label class="ui-label" for="amount">Valor (R$)</label>
-        <input class="ui-input" id="amount" name="amount" type="number" min="0.01" max="999999999999.99" step="0.01" inputmode="decimal" value="{{ old('amount', $financialTransaction->amount ?? '') }}" required data-transaction-amount>
+        <input class="ui-input" id="amount" name="amount" type="text" inputmode="decimal" value="{{ old('amount', $financialTransaction->amount ?? '') }}" required data-transaction-amount data-currency-input>
         <p class="mt-2 hidden rounded-xl border border-warning/20 bg-warning-soft px-3 py-2 text-xs text-warning" data-negative-balance-warning role="status">Esta saída pode deixar a conta com saldo negativo. O sistema permitirá o lançamento e manterá este alerta.</p>
     </div>
     <div>

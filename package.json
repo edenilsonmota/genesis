@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "choices.js": "^11.2.4",
-        "flowbite": "^4.0.2"
+        "flowbite": "^4.0.2",
+        "imask": "^7.6.1"
     }
 }

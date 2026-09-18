@@ -37,7 +37,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <label class="sr-only" for="active_church_id">Igreja ativa</label>
-                                <select class="ui-select max-w-52 py-2 text-xs" id="active_church_id" name="church_id" onchange="this.form.submit()" aria-label="Igreja ativa">
+                                <select class="ui-select w-auto max-w-[42vw] py-2 text-xs" id="active_church_id" name="church_id" onchange="this.form.submit()" aria-label="Igreja ativa" data-autosize-select data-select-min-width="7" data-select-max-width="28">
                                     @foreach ($availableAccessChurches as $accessChurch)
                                         <option value="{{ $accessChurch->id }}" @selected(($activeChurch?->id ?? null) === $accessChurch->id)>{{ $accessChurch->name }}</option>
                                     @endforeach

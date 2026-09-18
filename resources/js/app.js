@@ -7,3 +7,5 @@ import './position-department';
 import './uppercase-inputs';
 import './financial-owner';
 import './financial-transactions';
+import './currency-inputs';
+import './select-autosize';

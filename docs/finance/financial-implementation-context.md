@@ -4,7 +4,7 @@
 
 O Financeiro do Genesis+ é um controle gerencial de entradas, saídas e saldos. Ele não substitui contabilidade formal, escrituração fiscal ou demonstrações contábeis regulamentadas. “Balancete” fica reservado a um relatório futuro; o painel do módulo será denominado **Visão financeira**.
 
-Estão implementados `financial_accounts`, `financial_categories`, `financial_transactions` e `financial_movements`. Entradas, saídas e transferências podem ser salvas como rascunho, pendência ou liquidadas; somente movimentos liquidados compõem o saldo. Dízimos, Visão financeira, relatórios e anexos permanecem planejados.
+Estão implementados `financial_accounts`, `financial_categories`, `financial_transactions`, `financial_movements` e o fluxo de Dízimos. Entradas, saídas e transferências podem ser salvas como rascunho, pendência ou liquidadas; somente movimentos liquidados compõem o saldo. Visão financeira, relatórios e anexos permanecem planejados.
 
 ## Escopos e contas
 
@@ -30,9 +30,9 @@ O usuário responsável pelo lançamento será preservado para rastreabilidade. 
 
 ## Dízimos e privacidade
 
-Dízimos terão Controller, Service e telas próprios, separados de Movimentações para oferecer um fluxo adequado à igreja. Essa separação é somente de interface: cada dízimo será uma entrada associada a uma conta, terá recebimento e mês de referência, afetará o mesmo saldo e aparecerá nos relatórios consolidados.
+Dízimos possuem Controller e telas próprios, separados de Movimentações para oferecer um fluxo adequado à igreja. Essa separação é somente de interface: cada dízimo é uma entrada liquidada associada ao caixa padrão da igreja, possui data de recebimento e mês de referência, afeta o mesmo saldo e aparecerá nos relatórios consolidados.
 
-Quando informado, o membro contribuinte será dado financeiro sensível. A futura implementação deverá aplicar autorização específica, minimizar sua exposição em listagens e exportações e manter auditoria sem registrar conteúdo desnecessário. Não haverá tabela de saldo exclusiva para dízimos.
+O membro contribuinte é dado financeiro sensível. A tela exige a permissão específica `finance.tithes`, restringe membros e lançamentos à igreja autorizada e mantém auditoria sem registrar conteúdo desnecessário. Não há tabela de saldo exclusiva para dízimos.
 
 ## Autorização atual
 

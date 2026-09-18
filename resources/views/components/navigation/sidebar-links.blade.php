@@ -8,6 +8,7 @@
     $canViewPositions = auth()->user()->can('viewAny', App\Models\Position::class);
     $canViewDepartments = auth()->user()->can('viewAny', App\Models\Department::class);
     $canViewFinancialTransactions = auth()->user()->can('viewAny', App\Models\FinancialTransaction::class);
+    $canViewTithes = app(App\Services\PermissionService::class)->can(auth()->user(), 'finance.tithes', App\PermissionLevel::Read);
     $registrationsActive = request()->routeIs('organization.*') || request()->routeIs('members.*');
     $administrationActive = request()->routeIs('users.*') || request()->routeIs('positions.*') || request()->routeIs('departments.*');
     $financeActive = request()->routeIs('finance.*');
@@ -74,7 +75,7 @@
         </div>
     @endif
 
-    @if ($canViewFinancialTransactions)
+    @if ($canViewFinancialTransactions || $canViewTithes)
         <div class="relative mt-6">
             <button class="sidebar-category-toggle" type="button" data-sidebar-category-toggle data-sidebar-category="finance" data-sidebar-context="{{ $context }}" aria-controls="{{ $financeId }}" aria-expanded="{{ $financeActive ? 'true' : 'false' }}">
                 <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7.5h16v11H4zM7 5h10v2.5M4 11h16M8 15h3" /></svg>
@@ -86,6 +87,11 @@
             @if ($canViewFinancialTransactions)
                 <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('finance.transactions.*'), 'sidebar-item-idle' => ! request()->routeIs('finance.transactions.*')]) href="{{ route('finance.transactions.index') }}" data-sidebar-item @if(request()->routeIs('finance.transactions.*')) aria-current="page" @endif>
                     <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 7h14M15 3l4 4-4 4M19 17H5M9 13l-4 4 4 4" /></svg><span data-sidebar-text>Movimentações</span>
+                </a>
+            @endif
+            @if ($canViewTithes)
+                <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('finance.tithes.*'), 'sidebar-item-idle' => ! request()->routeIs('finance.tithes.*')]) href="{{ route('finance.tithes.index') }}" data-sidebar-item @if(request()->routeIs('finance.tithes.*')) aria-current="page" @endif>
+                    <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v18M7 7.5c0-1.4 1.3-2.5 3-2.5h3c1.7 0 3 1.1 3 2.5S14.7 10 13 10h-2c-1.7 0-3 1.1-3 2.5S9.3 15 11 15h3c1.7 0 3-1.1 3-2.5" /></svg><span data-sidebar-text>Dízimos</span>
                 </a>
             @endif
         </div>

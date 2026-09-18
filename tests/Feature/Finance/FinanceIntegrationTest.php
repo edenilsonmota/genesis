@@ -57,12 +57,12 @@ it('hides the finance sidebar from users without either implemented permission',
         ->assertDontSee('Movimentações');
 });
 
-it('exposes movements without deletion and keeps future finance routes private', function () {
+it('exposes implemented financial routes without deletion', function () {
     expect(Route::has('finance.accounts.index'))->toBeFalse()
         ->and(Route::has('finance.categories.index'))->toBeFalse()
         ->and(Route::has('finance.overview.index'))->toBeFalse()
         ->and(Route::has('finance.transactions.index'))->toBeTrue()
         ->and(Route::has('finance.transactions.destroy'))->toBeFalse()
-        ->and(Route::has('finance.tithes.index'))->toBeFalse()
+        ->and(Route::has('finance.tithes.index'))->toBeTrue()
         ->and(Route::has('finance.reports.index'))->toBeFalse();
 });

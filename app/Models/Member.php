@@ -64,6 +64,11 @@ class Member extends Model
         );
     }
 
+    public function financialTransactions(): HasMany
+    {
+        return $this->hasMany(FinancialTransaction::class);
+    }
+
     public function churches(): BelongsToMany
     {
         return $this->belongsToMany(Church::class, 'member_church_memberships')

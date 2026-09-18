@@ -42,6 +42,47 @@ class FinancialTransactionService
     }
 
     /** @param array<string, mixed> $data */
+    public function createTithe(array $data, User $actor): FinancialTransaction
+    {
+        return $this->createSingleMovement(
+            $data,
+            $actor,
+            FinancialTransactionType::Income,
+            FinancialTransactionOrigin::Tithe,
+            'finance.tithes',
+            (string) $data['member_id'],
+        );
+    }
+
+    /** @param array{payment_method: string, description: ?string} $data */
+    public function updateTitheDetails(FinancialTransaction $financialTransaction, array $data, User $actor): FinancialTransaction
+    {
+        return $this->execute('update_tithe_details', $financialTransaction, function () use ($financialTransaction, $data, $actor): FinancialTransaction {
+            $transaction = FinancialTransaction::query()->lockForUpdate()->findOrFail($financialTransaction->id);
+            $transaction->load(['movements' => fn ($query) => $query->lockForUpdate(), 'movements.account']);
+
+            if ($transaction->origin !== FinancialTransactionOrigin::Tithe || $transaction->movements->count() !== 1) {
+                throw ValidationException::withMessages(['financial_transaction' => 'Os detalhes só podem ser alterados em um dízimo válido.']);
+            }
+
+            $account = $transaction->movements->first()->account;
+            $this->assertAccountCanBeUsed($actor, $account, 'financial_transaction', requireActive: false, permissionModule: 'finance.tithes');
+            $before = ['payment_method' => $transaction->payment_method?->value, 'description' => $transaction->description];
+            $transaction->update([
+                'payment_method' => $data['payment_method'],
+                'description' => $data['description'],
+                'updated_by_user_id' => $actor->id,
+            ]);
+            $this->recordAudit('financial_tithe.details_updated', $transaction->load('movements'), $account, [
+                'before' => $before,
+                'after' => ['payment_method' => $transaction->payment_method?->value, 'description' => $transaction->description],
+            ]);
+
+            return $transaction;
+        });
+    }
+
+    /** @param array<string, mixed> $data */
     public function createTransfer(array $data, User $actor): FinancialTransaction
     {
         return $this->execute('create_transfer', null, function () use ($data, $actor): FinancialTransaction {
@@ -241,20 +282,31 @@ class FinancialTransactionService
     }
 
     /** @param array<string, mixed> $data */
-    private function createSingleMovement(array $data, User $actor, FinancialTransactionType $type): FinancialTransaction
+    private function createSingleMovement(
+        array $data,
+        User $actor,
+        FinancialTransactionType $type,
+        FinancialTransactionOrigin $origin = FinancialTransactionOrigin::Manual,
+        string $permissionModule = 'finance.transactions',
+        ?string $memberId = null,
+    ): FinancialTransaction
     {
-        return $this->execute('create_'.$type->value, null, function () use ($data, $actor, $type): FinancialTransaction {
+        return $this->execute('create_'.$type->value, null, function () use ($data, $actor, $type, $origin, $permissionModule, $memberId): FinancialTransaction {
             $account = $this->lockedAccounts([(string) $data['account_id']])->first();
             if ($account === null) {
                 throw ValidationException::withMessages(['account_id' => 'Selecione uma conta financeira válida.']);
             }
 
-            $this->assertAccountCanBeUsed($actor, $account, 'account_id');
+            $this->assertAccountCanBeUsed($actor, $account, 'account_id', permissionModule: $permissionModule);
             $category = $this->validatedCategory((string) $data['category_id'], $account, $type);
             $this->validatedDepartment($data['department_id'] ?? null, $account);
-            $this->validatedResponsibleMember($data['responsible_member_id'] ?? null, $account, (string) $data['occurred_on']);
+            $member = $this->validatedResponsibleMember(
+                $memberId ?? ($data['responsible_member_id'] ?? null),
+                $account,
+                (string) $data['occurred_on'],
+            );
 
-            $transaction = $this->createTransaction($data, $actor, $type, $category);
+            $transaction = $this->createTransaction($data, $actor, $type, $category, $origin, $member?->id);
             $settledOn = $transaction->status === FinancialTransactionStatus::Settled
                 ? $transaction->occurred_on->toDateString()
                 : null;
@@ -263,7 +315,7 @@ class FinancialTransactionService
                 : FinancialMovementDirection::Outflow;
             $this->createMovement($transaction, $account, $direction, $settledOn);
             $this->assertMovementStructure($transaction->load('movements'));
-            $this->recordAudit('financial_transaction.created', $transaction, $account);
+            $this->recordAudit($origin === FinancialTransactionOrigin::Tithe ? 'financial_tithe.created' : 'financial_transaction.created', $transaction, $account);
 
             return $transaction->load('movements.account');
         });
@@ -275,14 +327,16 @@ class FinancialTransactionService
         User $actor,
         FinancialTransactionType $type,
         ?FinancialCategory $category,
+        FinancialTransactionOrigin $origin = FinancialTransactionOrigin::Manual,
+        ?string $memberId = null,
     ): FinancialTransaction {
         return FinancialTransaction::query()->create([
             'type' => $type,
-            'origin' => FinancialTransactionOrigin::Manual,
+            'origin' => $origin,
             'category_id' => $category?->id,
             'department_id' => $type === FinancialTransactionType::Transfer ? null : ($data['department_id'] ?? null),
-            'member_id' => null,
-            'responsible_member_id' => $type === FinancialTransactionType::Transfer ? null : ($data['responsible_member_id'] ?? null),
+            'member_id' => $memberId,
+            'responsible_member_id' => $type === FinancialTransactionType::Transfer ? null : ($memberId ?? ($data['responsible_member_id'] ?? null)),
             ...$this->transactionAttributes($data, $actor),
         ]);
     }
@@ -451,6 +505,7 @@ class FinancialTransactionService
         FinancialAccount $account,
         string $field,
         bool $requireActive = true,
+        string $permissionModule = 'finance.transactions',
     ): void {
         if ($requireActive && $account->status !== Status::Active) {
             throw ValidationException::withMessages([$field => 'A conta financeira selecionada precisa estar ativa.']);
@@ -458,7 +513,7 @@ class FinancialTransactionService
         if (! $this->permissions->canUseFinancialAccount(
             $actor,
             $account,
-            'finance.transactions',
+            $permissionModule,
             PermissionLevel::Write,
         )) {
             throw ValidationException::withMessages([$field => 'Você não possui permissão de escrita no escopo desta conta financeira.']);
