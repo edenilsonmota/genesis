@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class AuditService
@@ -19,7 +20,7 @@ class AuditService
     ): AuditLog {
         $actor = auth()->user();
 
-        return AuditLog::query()->create([
+        $log = AuditLog::query()->create([
             'actor_user_id' => $actor?->id,
             'actor_name' => $actor?->display_name,
             'actor_username' => $actor?->username,
@@ -32,6 +33,11 @@ class AuditService
             'ip_address' => request()?->ip(),
             'details' => $this->sanitize($details),
         ]);
+
+        Cache::add('dashboard-overview:version', 1, now()->addYear());
+        Cache::increment('dashboard-overview:version');
+
+        return $log;
     }
 
     /** @param array<string, mixed> $details

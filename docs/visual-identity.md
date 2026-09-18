@@ -28,7 +28,7 @@ Esta é a referência obrigatória para novas telas Blade e componentes do Genes
 
 Controles desabilitados usam `border-default` como fundo e `text-disabled-control` (`#8292A8`) no texto; textos informativos desabilitados mantêm `text-disabled` (`#94A3B8`).
 
-O gradiente institucional é `brand-gradient`: `linear-gradient(135deg, #2BD9FB 0%, #088CF3 45%, #0051F5 70%, #0031D1 100%)`. Ele é reservado a superfícies de destaque, como o resumo do dashboard e detalhes decorativos de autenticação; não deve comprometer a leitura de textos longos.
+O gradiente institucional é `brand-gradient`: `linear-gradient(135deg, #2BD9FB 0%, #088CF3 45%, #0051F5 70%, #0031D1 100%)`. Ele é reservado a superfícies de destaque e detalhes decorativos; não deve comprometer a leitura de textos longos.
 
 ## Componentes de interface
 
@@ -68,7 +68,7 @@ A fonte única dos itens da navegação é `resources/views/components/navigatio
 - A categoria **Cadastros** é expansível e guarda a preferência em `genesis.sidebar.registrations.open`. Uma rota de Área e Igrejas ou Membros mantém a categoria aberta para evidenciar o contexto atual.
 - A categoria **Administração** é expansível e guarda a preferência em `genesis.sidebar.administration.open`. Ela contém, nesta ordem, Usuários, Cargos e permissões e Departamentos. A matriz pertence à tela de cargos e sua taxonomia de módulos reproduz as categorias da sidebar.
 - A categoria **Financeiro** é expansível, guarda a preferência em `genesis.sidebar.finance.open` e exibe, nesta ordem e conforme a permissão, **Visão financeira**, **Movimentações** e **Dízimos**. Contas e categorias continuam como infraestrutura interna do domínio financeiro.
-- A sidebar e o drawer usam `surface-card` como fundo, com texto escuro, bordas suaves e estado ativo em `brand-primary-soft`. O gradiente institucional fica reservado aos destaques de conteúdo, como o cabeçalho do dashboard.
+- A sidebar e o drawer usam `surface-card` como fundo, com texto escuro, bordas suaves e estado ativo em `brand-primary-soft`. O gradiente institucional fica reservado aos destaques de conteúdo e às visualizações de dados previstas nesta identidade.
 - Abaixo de `lg`, a navegação usa o drawer do Flowbite, com backdrop, fechamento por Escape, bloqueio de rolagem, foco inicial e ciclo de Tab. O botão de abertura comunica o estado por `aria-expanded`.
 - Layouts e formulários devem ser revisados, no mínimo, em 1440px, 1024px, 768px e 390px. Não ocultar uma ação essencial apenas porque a largura diminuiu.
 

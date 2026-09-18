@@ -14,3 +14,7 @@ import './date-inputs';
 if (document.querySelector('[data-financial-overview]')) {
     import('./financial-overview');
 }
+
+if (document.querySelector('[data-dashboard-overview]')) {
+    import('./dashboard-overview');
+}

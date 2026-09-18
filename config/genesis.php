@@ -9,4 +9,7 @@ return [
     'finance' => [
         'overview_cache_seconds' => env('FINANCE_OVERVIEW_CACHE_SECONDS', 300),
     ],
+    'dashboard' => [
+        'overview_cache_seconds' => env('DASHBOARD_OVERVIEW_CACHE_SECONDS', 300),
+    ],
 ];
