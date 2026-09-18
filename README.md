@@ -12,7 +12,7 @@ Sistema web Laravel para gestão de igrejas, membros, cargos e acesso por permis
 - departamentos pertencem à área e servem apenas para categorizar cargos;
 - o administrador global é uma conta técnica protegida criada pelo Seeder.
 
-Na sidebar, Administração contém **Usuários**, **Cargos e permissões** e **Departamentos**. Consulte [contexto de implementação](docs/genesis-implementation-context.md), [modelo de domínio](docs/genesis-domain-model.mmd), [plano de migrations](docs/migration-plan.md) e [identidade visual](docs/visual-identity.md).
+Na sidebar, Administração contém **Usuários**, **Cargos e permissões**, **Departamentos** e **Auditoria**. Consulte [contexto de implementação](docs/genesis-implementation-context.md), [modelo de domínio](docs/genesis-domain-model.mmd), [plano de migrations](docs/migration-plan.md) e [identidade visual](docs/visual-identity.md).
 
 A fundação do módulo Financeiro está documentada separadamente em [contexto financeiro](docs/finance/financial-implementation-context.md), [modelo financeiro](docs/finance/financial-domain-model.mmd) e [roadmap financeiro](docs/finance/financial-roadmap.md).
 

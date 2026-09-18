@@ -7,11 +7,12 @@
     $canViewUsers = auth()->user()->can('viewAny', App\Models\User::class);
     $canViewPositions = auth()->user()->can('viewAny', App\Models\Position::class);
     $canViewDepartments = auth()->user()->can('viewAny', App\Models\Department::class);
+    $canViewAudit = app(App\Services\PermissionService::class)->can(auth()->user(), 'audit', App\PermissionLevel::Read);
     $canViewFinancialTransactions = auth()->user()->can('viewAny', App\Models\FinancialTransaction::class);
     $canViewFinancialOverview = app(App\Services\PermissionService::class)->can(auth()->user(), 'finance.overview', App\PermissionLevel::Read);
     $canViewTithes = app(App\Services\PermissionService::class)->can(auth()->user(), 'finance.tithes', App\PermissionLevel::Read);
     $registrationsActive = request()->routeIs('organization.*') || request()->routeIs('members.*');
-    $administrationActive = request()->routeIs('users.*') || request()->routeIs('positions.*') || request()->routeIs('departments.*');
+    $administrationActive = request()->routeIs('users.*') || request()->routeIs('positions.*') || request()->routeIs('departments.*') || request()->routeIs('audit.*');
     $financeActive = request()->routeIs('finance.*');
     $registrationsId = 'sidebar-registrations-'.$context;
     $administrationId = 'sidebar-administration-'.$context;
@@ -49,7 +50,7 @@
         </div>
     @endif
 
-    @if ($canViewUsers || $canViewPositions || $canViewDepartments)
+    @if ($canViewUsers || $canViewPositions || $canViewDepartments || $canViewAudit)
         <div class="relative mt-6">
             <button class="sidebar-category-toggle" type="button" data-sidebar-category-toggle data-sidebar-category="administration" data-sidebar-context="{{ $context }}" aria-controls="{{ $administrationId }}" aria-expanded="{{ $administrationActive ? 'true' : 'false' }}">
                 <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4.5h14v15H5zM9 4.5v-2h6v2M9 10h6M9 14h6" /></svg>
@@ -71,6 +72,11 @@
             @if ($canViewDepartments)
                 <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('departments.*'), 'sidebar-item-idle' => ! request()->routeIs('departments.*')]) href="{{ route('departments.index') }}" data-sidebar-item @if(request()->routeIs('departments.*')) aria-current="page" @endif>
                     <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h3v3H8zM13 9h3M13 12h3M8 15h8" /></svg><span data-sidebar-text>Departamentos</span>
+                </a>
+            @endif
+            @if ($canViewAudit)
+                <a @class(['sidebar-item', 'sidebar-item-active' => request()->routeIs('audit.*'), 'sidebar-item-idle' => ! request()->routeIs('audit.*')]) href="{{ route('audit.index') }}" data-sidebar-item @if(request()->routeIs('audit.*')) aria-current="page" @endif>
+                    <svg class="size-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8.1 7 10 4.2-1.9 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg><span data-sidebar-text>Auditoria</span>
                 </a>
             @endif
         </div>

@@ -18,9 +18,10 @@ it('shows the implemented categories and routes to a global administrator', func
 
     $this->actingAs($administrator)->get(route('dashboard'))->assertOk()
         ->assertSee('Cadastros')->assertSee('Área e Igrejas')->assertSee('Membros')
-        ->assertSee('Administração')->assertSee('Usuários')->assertSee('Cargos e permissões')->assertSee('Departamentos')
+        ->assertSee('Administração')->assertSee('Usuários')->assertSee('Cargos e permissões')->assertSee('Departamentos')->assertSee('Auditoria')
         ->assertSee('href="'.route('positions.index').'"', false)
         ->assertSee('href="'.route('departments.index').'"', false)
+        ->assertSee('href="'.route('audit.index').'"', false)
         ->assertSee('Financeiro')->assertSee('Visão financeira')->assertSee('Movimentações')
         ->assertSee('href="'.route('finance.overview.index').'"', false)
         ->assertSee('href="'.route('finance.transactions.index').'"', false);
@@ -29,7 +30,7 @@ it('shows the implemented categories and routes to a global administrator', func
 it('keeps each administration item active only on its own routes', function () {
     $administrator = User::factory()->globalAdministrator()->create();
 
-    foreach ([route('users.index'), route('positions.index'), route('departments.index')] as $url) {
+    foreach ([route('users.index'), route('positions.index'), route('departments.index'), route('audit.index')] as $url) {
         $response = $this->actingAs($administrator)->get($url);
         $response->assertOk();
         expect($response->getContent())->toMatch('/href="'.preg_quote($url, '/').'"[^>]*aria-current="page"/')

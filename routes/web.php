@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActiveChurchController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordController;
@@ -35,6 +36,7 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
 
     Route::middleware('password.changed')->group(function (): void {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
+        Route::get('/audit', AuditLogController::class)->name('audit.index');
         Route::patch('/active-church', [ActiveChurchController::class, 'update'])->name('active-church.update');
 
         Route::prefix('perfil')->name('profile.')->group(function (): void {

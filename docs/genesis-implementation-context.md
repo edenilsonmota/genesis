@@ -62,7 +62,7 @@ Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias
 
 As capacidades `finance.overview`, `finance.transactions` e `finance.tithes` possuem telas próprias na categoria Financeiro; **Visão financeira** é a primeira opção. `finance.reports` permanece reservada para evolução futura. O contexto ativo limita os dados à igreja selecionada, enquanto **Visão geral** consolida todas as áreas e igrejas exclusivamente para o administrador global. O domínio e a evolução do módulo estão em [`docs/finance`](finance/financial-implementation-context.md).
 
-A categoria Administração exibe, nesta ordem: Usuários, Cargos e permissões e Departamentos. A matriz exibida em um cargo usa as mesmas categorias dos módulos cadastrados.
+A categoria Administração exibe, nesta ordem: Usuários, Cargos e permissões, Departamentos e Auditoria. A matriz exibida em um cargo usa as mesmas categorias dos módulos cadastrados.
 
 ## Fluxos
 
@@ -83,6 +83,8 @@ Desmarcar `grants_system_access` informa a quantidade de membros e usuários afe
 ## Auditoria e segurança
 
 `audit_logs` registra snapshots do ator, ação, recurso, rota, registro, escopo, IP e detalhes sanitizados. São auditadas alterações de área, igreja, membro, vínculo, departamento, cargo, matriz, atribuição, usuário, senha temporária e administrador global. Chaves relacionadas a senha, hash, token ou segredo são removidas defensivamente.
+
+A rota `/audit` é somente leitura e exige permissão de leitura ou escrita no módulo `audit`. O administrador global usa **Visão geral** para consultar a trilha consolidada e pode selecionar uma igreja no cabeçalho para restringi-la. Usuários comuns veem exclusivamente eventos relacionados às igrejas às quais possuem acesso efetivo; o escopo é aplicado no backend e inclui registros diretos da igreja, estruturas compartilhadas de sua área e registros de membros ou usuários vinculados. Busca, ação, tipo de registro e período são filtros expansíveis, e os detalhes preservam rota e IP sem revelar dados sensíveis sanitizados.
 
 Foreign keys históricas usam `RESTRICT`; dependências técnicas da matriz usam `CASCADE`. Índices funcionais garantem unicidade case-insensitive e índices parciais garantem unicidade dos vínculos ativos. Validação de formulário não substitui constraints nem locks transacionais.
 
