@@ -6,15 +6,16 @@
 @section('content')
     @php($profile = $user->member ?? $user)
 
-    <header class="mb-8">
-        <p class="ui-page-kicker">Conta</p>
-        <h1 class="mt-1 ui-page-title">Meu perfil</h1>
-        <p class="mt-2 ui-page-copy">Gerencie sua foto, informações pessoais e credenciais de acesso.</p>
-    </header>
+    <div class="mx-auto max-w-6xl">
+        <header class="mb-8">
+            <p class="ui-page-kicker">Conta</p>
+            <h1 class="mt-1 ui-page-title">Meu perfil</h1>
+            <p class="mt-2 ui-page-copy">Gerencie sua foto, informações pessoais e credenciais de acesso.</p>
+        </header>
 
-    <div class="grid max-w-5xl gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.85fr)]">
+    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)]">
         <section class="ui-card p-6 sm:p-8">
-            <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <div class="flex flex-col gap-5 rounded-2xl border border-border-default bg-surface-muted/60 p-4 sm:flex-row sm:items-center sm:p-5">
                 @if ($user->profile_photo_path)
                     <img class="size-20 rounded-2xl border border-border-default object-cover" src="{{ asset('storage/'.$user->profile_photo_path) }}" alt="Foto de {{ $user->display_name }}">
                 @else
@@ -26,13 +27,13 @@
                 </div>
             </div>
 
-            <form class="mt-7 grid gap-5" method="POST" action="{{ route('profile.details.update') }}" enctype="multipart/form-data">
+            <form class="mt-6 grid gap-6" method="POST" action="{{ route('profile.details.update') }}" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
 
-                <div>
+                <div class="rounded-2xl border border-border-default p-4 sm:p-5">
                     <label class="ui-label" for="profile_photo">Foto do perfil</label>
-                    <input class="ui-input file:mr-3 file:rounded-lg file:border-0 file:bg-brand-primary-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-primary" id="profile_photo" name="profile_photo" type="file" accept="image/jpeg,image/png,image/webp">
+                    <input class="ui-input mt-1 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-primary-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-brand-primary" id="profile_photo" name="profile_photo" type="file" accept="image/jpeg,image/png,image/webp">
                     <p class="mt-1.5 text-xs text-text-secondary">JPG, PNG ou WebP, com até 2 MB.</p>
                     @error('profile_photo') <p class="mt-2 text-sm text-danger">{{ $message }}</p> @enderror
                     @if ($user->profile_photo_path)
@@ -40,18 +41,19 @@
                     @endif
                 </div>
 
-                <div class="grid gap-5 sm:grid-cols-2">
+                <fieldset class="grid gap-5 sm:grid-cols-2">
+                    <legend class="mb-1 text-sm font-semibold text-text-primary sm:col-span-2">Dados de contato</legend>
                     <div class="sm:col-span-2"><label class="ui-label" for="name">Nome</label><input class="ui-input" id="name" name="name" value="{{ old('name', $profile->name ?? $user->display_name) }}" maxlength="255" required>@error('name') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
                     <div><label class="ui-label" for="cpf">CPF{{ $user->member ? ' *' : '' }}</label><input class="ui-input" id="cpf" name="cpf" value="{{ old('cpf', $profile->cpf) }}" inputmode="numeric" maxlength="14" @required($user->member) data-cpf-mask>@error('cpf') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
                     <div><label class="ui-label" for="phone">Telefone</label><input class="ui-input" id="phone" name="phone" value="{{ old('phone', $profile->phone) }}" inputmode="tel" maxlength="15" data-phone-mask>@error('phone') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
                     <div class="sm:col-span-2"><label class="ui-label" for="email">E-mail</label><input class="ui-input" id="email" name="email" value="{{ old('email', $profile->email) }}" type="email" maxlength="255" autocomplete="email">@error('email') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
-                </div>
+                </fieldset>
 
                 <div class="flex justify-end border-t border-border-default pt-5"><button class="ui-button-primary" type="submit">Salvar informações</button></div>
             </form>
         </section>
 
-        <div class="grid content-start gap-6">
+        <aside class="grid content-start gap-6" aria-label="Credenciais de acesso">
             <section class="ui-card p-6">
                 <h2 class="text-lg font-semibold text-text-primary">Nome de usuário</h2>
                 <p class="mt-1 text-sm leading-6 text-text-secondary">Use de 3 a 50 caracteres: letras sem acento, números, ponto, hífen ou sublinhado.</p>
@@ -59,7 +61,7 @@
                     @csrf
                     @method('PATCH')
                     <div><label class="ui-label" for="username">Usuário</label><input class="ui-input" id="username" name="username" value="{{ old('username', $user->username) }}" minlength="3" maxlength="50" required autocomplete="username">@error('username') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
-                    <button class="ui-button-outline" type="submit">Atualizar usuário</button>
+                    <button class="ui-button-outline w-full" type="submit">Atualizar usuário</button>
                 </form>
             </section>
 
@@ -72,9 +74,10 @@
                     <div><label class="ui-label" for="current_password">Senha atual</label><input class="ui-input" id="current_password" name="current_password" type="password" autocomplete="current-password" required>@error('current_password') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
                     <div><label class="ui-label" for="password">Nova senha</label><input class="ui-input" id="password" name="password" type="password" autocomplete="new-password" required>@error('password') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror</div>
                     <div><label class="ui-label" for="password_confirmation">Confirmar nova senha</label><input class="ui-input" id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required></div>
-                    <button class="ui-button-outline" type="submit">Atualizar senha</button>
+                    <button class="ui-button-outline w-full" type="submit">Atualizar senha</button>
                 </form>
             </section>
-        </div>
+        </aside>
+    </div>
     </div>
 @endsection
