@@ -19,6 +19,7 @@
     },
     "dependencies": {
         "choices.js": "^11.2.4",
+        "echarts": "^6.1.0",
         "flatpickr": "^4.6.13",
         "flowbite": "^4.0.2",
         "imask": "^7.6.1"

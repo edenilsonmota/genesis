@@ -61,10 +61,10 @@ it('enforces transaction read and write permissions in the backend', function ()
     $context = transactionContext(PermissionLevel::Read);
     $withoutPermission = userWithPermission('dashboard');
 
-    $this->actingAs($context['user'])->get(route('finance.transactions.index'))->assertOk();
+    $this->actingAs($context['user'])->get(route('finance.transactions.index'))->assertRedirect(route('finance.overview.index'));
     $this->actingAs($context['user'])->get(route('finance.transactions.create'))->assertForbidden();
     $this->actingAs($context['user'])->post(route('finance.transactions.income.store'), incomePayload($context))->assertForbidden();
-    $this->actingAs($withoutPermission)->get(route('finance.transactions.index'))->assertForbidden();
+    $this->actingAs($withoutPermission)->get(route('finance.transactions.index'))->assertRedirect(route('finance.overview.index'));
 });
 
 it('creates a custom category from the movement form in the selected area and type', function () {

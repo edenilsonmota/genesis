@@ -41,6 +41,17 @@ O gradiente institucional é `brand-gradient`: `linear-gradient(135deg, #2BD9FB 
 - Paginação: o template local usa a ação principal na página ativa, estados desabilitados legíveis e foco nítido.
 - Matriz de permissões por cargo: os módulos são agrupados exatamente pelas categorias da sidebar — **Principal**, **Cadastros**, **Administração** e **Financeiro** — e na mesma ordem. Cada registro representa uma tela/capacidade do backend e apresenta nome, descrição e as três escolhas mutuamente exclusivas — Sem acesso, Leitura e Escrita. A relação de chaves, telas e categorias está em `docs/genesis-implementation-context.md`.
 
+## Gráficos e visualização de dados
+
+Apache ECharts é a biblioteca padrão para gráficos interativos. Deve ser importada de forma modular e carregada somente nas telas que exibem gráficos; não usar CDN em produção nem introduzir outra biblioteca sem uma decisão arquitetural explícita.
+
+- Paleta dos gráficos: azul principal `#0051F5`, azul claro `#2BD9FB`, entradas/sucesso `#16A34A`, pendências/alerta `#F59E0B` e saídas/erro `#EF4444`.
+- Barras usam gradiente vertical, sombra discreta e cantos superiores amplamente arredondados; barras horizontais arredondam a extremidade de valor.
+- Linhas são suaves, com terminação arredondada, marcadores circulares e preenchimento em gradiente de baixa opacidade quando fizer sentido para a leitura.
+- Roscas e pizzas usam separação branca entre fatias, `padAngle` e bordas arredondadas; preferir rosca a pizza quando houver categorias e legenda.
+- Legendas nunca podem disputar espaço com eixos ou rótulos: ficam abaixo da área de plotagem, com espaço reservado no `grid.bottom`, ícone `roundRect` e texto legível. Quando houver muitos itens, usar legenda rolável ou adaptar a orientação.
+- Preservar tooltip em português do Brasil, valores em real brasileiro, `aria.enabled` e `ResizeObserver` para acessibilidade e responsividade. Rótulos extensos devem truncar, girar ou ganhar mais espaço de grade antes de sobrepor conteúdo.
+
 ## Estados de interação
 
 - **Hover:** botões e links reforçam a ação com `brand-primary-hover`, `surface-muted` ou borda `brand-sky`, conforme a sua hierarquia; não usam mudanças bruscas de layout.
@@ -56,7 +67,7 @@ A fonte única dos itens da navegação é `resources/views/components/navigatio
 - Recolhida, ela mostra o símbolo e os ícones centralizados; expandida, mostra o nome `Genesis+`, os rótulos e as categorias. O usuário permanece no topo direito do cabeçalho, nunca no rodapé da sidebar.
 - A categoria **Cadastros** é expansível e guarda a preferência em `genesis.sidebar.registrations.open`. Uma rota de Área e Igrejas ou Membros mantém a categoria aberta para evidenciar o contexto atual.
 - A categoria **Administração** é expansível e guarda a preferência em `genesis.sidebar.administration.open`. Ela contém, nesta ordem, Usuários, Cargos e permissões e Departamentos. A matriz pertence à tela de cargos e sua taxonomia de módulos reproduz as categorias da sidebar.
-- A categoria **Financeiro** é expansível, guarda a preferência em `genesis.sidebar.finance.open` e exibe **Movimentações**. Contas são caixas internos criados automaticamente para a Área e para cada Igreja; categorias são selecionadas ou criadas diretamente no formulário da movimentação, sem tela própria nesta fase.
+- A categoria **Financeiro** é expansível, guarda a preferência em `genesis.sidebar.finance.open` e exibe **Visão financeira** como primeira opção, seguida de Dízimos quando autorizada. A interface de Movimentações não é exibida nesta fase; contas e categorias continuam como infraestrutura interna do domínio financeiro.
 - A sidebar e o drawer usam `surface-card` como fundo, com texto escuro, bordas suaves e estado ativo em `brand-primary-soft`. O gradiente institucional fica reservado aos destaques de conteúdo, como o cabeçalho do dashboard.
 - Abaixo de `lg`, a navegação usa o drawer do Flowbite, com backdrop, fechamento por Escape, bloqueio de rolagem, foco inicial e ciclo de Tab. O botão de abertura comunica o estado por `aria-expanded`.
 - Layouts e formulários devem ser revisados, no mínimo, em 1440px, 1024px, 768px e 390px. Não ocultar uma ação essencial apenas porque a largura diminuiu.

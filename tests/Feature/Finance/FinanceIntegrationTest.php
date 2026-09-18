@@ -35,14 +35,14 @@ it('shows financial capabilities in the position permission matrix', function ()
         ->assertSee('Dízimos');
 });
 
-it('shows only the movements item when its read permission is available', function () {
+it('hides the Finance category when only the archived movements permission is available', function () {
     $transactionReader = userWithPermission('finance.transactions', PermissionLevel::Read);
+    grantPermissionToUser($transactionReader, 'dashboard');
 
-    $this->actingAs($transactionReader)->get(route('finance.transactions.index'))
+    $this->actingAs($transactionReader)->get(route('dashboard'))
         ->assertOk()
-        ->assertSee('Financeiro')
-        ->assertSee('Movimentações')
-        ->assertSee('href="'.route('finance.transactions.index').'"', false)
+        ->assertDontSee('Financeiro')
+        ->assertDontSee('Movimentações')
         ->assertDontSee('Visão financeira')
         ->assertDontSee('Dízimos')
         ->assertDontSee('Relatórios');
@@ -60,7 +60,7 @@ it('hides the finance sidebar from users without either implemented permission',
 it('exposes implemented financial routes without deletion', function () {
     expect(Route::has('finance.accounts.index'))->toBeFalse()
         ->and(Route::has('finance.categories.index'))->toBeFalse()
-        ->and(Route::has('finance.overview.index'))->toBeFalse()
+        ->and(Route::has('finance.overview.index'))->toBeTrue()
         ->and(Route::has('finance.transactions.index'))->toBeTrue()
         ->and(Route::has('finance.transactions.destroy'))->toBeFalse()
         ->and(Route::has('finance.tithes.index'))->toBeTrue()

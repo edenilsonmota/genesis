@@ -18,6 +18,7 @@ use App\Services\AuditService;
 use App\Services\PermissionService;
 use App\Status;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -628,7 +629,11 @@ class FinancialTransactionService
     private function execute(string $operation, ?FinancialTransaction $transaction, callable $callback): mixed
     {
         try {
-            return DB::transaction($callback);
+            $result = DB::transaction($callback);
+            Cache::add('finance-overview:version', 1, now()->addYear());
+            Cache::increment('finance-overview:version');
+
+            return $result;
         } catch (ValidationException $exception) {
             $this->audit->record(
                 'financial_transaction.blocked',

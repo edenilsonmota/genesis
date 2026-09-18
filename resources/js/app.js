@@ -10,3 +10,7 @@ import './financial-transactions';
 import './currency-inputs';
 import './select-autosize';
 import './date-inputs';
+
+if (document.querySelector('[data-financial-overview]')) {
+    import('./financial-overview');
+}

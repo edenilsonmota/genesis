@@ -6,4 +6,7 @@ return [
         'username' => env('GENESIS_ADMIN_USERNAME'),
         'password' => env('GENESIS_ADMIN_PASSWORD'),
     ],
+    'finance' => [
+        'overview_cache_seconds' => env('FINANCE_OVERVIEW_CACHE_SECONDS', 300),
+    ],
 ];

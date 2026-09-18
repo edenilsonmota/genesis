@@ -25,8 +25,8 @@ it('lists church members and records a tithe only with tithe write permission', 
         'church_id' => $church->id,
         'member_id' => $member->id,
         'amount' => '100.00',
-        'paid_on' => '2026-09-15',
-        'competence_month' => '2026-09',
+        'paid_on' => today()->toDateString(),
+        'competence_month' => today()->format('Y-m'),
         'payment_method' => 'pix',
     ])->assertForbidden();
 
@@ -34,10 +34,10 @@ it('lists church members and records a tithe only with tithe write permission', 
         'church_id' => $church->id,
         'member_id' => $member->id,
         'amount' => '100.00',
-        'paid_on' => '2026-09-15',
-        'competence_month' => '2026-09',
+        'paid_on' => today()->toDateString(),
+        'competence_month' => today()->format('Y-m'),
         'payment_method' => 'pix',
-    ])->assertRedirect();
+    ])->assertRedirect()->assertSessionHasNoErrors();
 
     expect(FinancialTransaction::query()->sole()->origin)->toBe(FinancialTransactionOrigin::Tithe);
 });

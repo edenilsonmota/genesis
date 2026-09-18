@@ -4,7 +4,7 @@
 
 O Financeiro do Genesis+ é um controle gerencial de entradas, saídas e saldos. Ele não substitui contabilidade formal, escrituração fiscal ou demonstrações contábeis regulamentadas. “Balancete” fica reservado a um relatório futuro; o painel do módulo será denominado **Visão financeira**.
 
-Estão implementados `financial_accounts`, `financial_categories`, `financial_transactions`, `financial_movements` e o fluxo de Dízimos. Entradas, saídas e transferências podem ser salvas como rascunho, pendência ou liquidadas; somente movimentos liquidados compõem o saldo. Visão financeira, relatórios e anexos permanecem planejados.
+Estão implementados `financial_accounts`, `financial_categories`, `financial_transactions`, `financial_movements`, o fluxo de Dízimos e a Visão financeira. Entradas, saídas e transferências podem ser salvas como rascunho, pendência ou liquidadas; somente movimentos liquidados compõem o saldo. Relatórios e anexos permanecem planejados.
 
 ## Escopos e contas
 
@@ -24,7 +24,9 @@ Transferência será um tipo próprio de transação e não uma categoria de ent
 
 ## Movimentos, consolidação e responsabilidade futura
 
-Uma transação representa o fato gerencial — entrada, despesa, transferência ou estorno — e gera movimentos nas contas. Transferências produzem movimentos opostos e atômicos entre duas contas, sem receita ou despesa artificial. A Visão financeira futura consolidará contas da área e das igrejas conforme autorização, sempre a partir desses movimentos.
+Uma transação representa o fato gerencial — entrada, despesa, transferência ou estorno — e gera movimentos nas contas. Transferências produzem movimentos opostos e atômicos entre duas contas, sem receita ou despesa artificial. A Visão financeira consolida contas da área e das igrejas conforme autorização, sempre a partir desses movimentos.
+
+A Visão financeira consolida os movimentos liquidados por ano e pelo contexto da igreja ativa. No contexto **Visão geral**, exclusivo do administrador global, agrega todas as contas da área e das igrejas. Os gráficos usam Apache ECharts, importado modularmente e carregado apenas nesta tela. Seguem o padrão visual documentado em `docs/visual-identity.md`: gradientes, cantos amplos, sombras sutis, linhas suaves e legendas arredondadas fora da área dos eixos. Os agregados ficam em cache por cinco minutos e usam o store padrão do Laravel; produção configura `CACHE_STORE=redis`. Qualquer mutação financeira incrementa a versão do cache para que a próxima leitura seja recalculada imediatamente.
 
 O usuário responsável pelo lançamento será preservado para rastreabilidade. Alterações relevantes usarão a auditoria existente. Cancelamentos e estornos serão operações explícitas que preservam histórico; registros financeiros confirmados não serão simplesmente apagados ou reescritos.
 

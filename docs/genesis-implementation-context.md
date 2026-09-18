@@ -54,7 +54,7 @@ Cada módulo corresponde a uma tela ou capacidade real do backend. As categorias
 | Administração | `departments` | Departamentos |
 | Administração | `audit` | Auditoria |
 
-As capacidades reservadas `finance.overview`, `finance.transactions`, `finance.tithes` e `finance.reports` já fazem parte da matriz, mas não possuem telas ou links nesta etapa. O domínio e a evolução do módulo estão em [`docs/finance`](finance/financial-implementation-context.md).
+As capacidades `finance.overview` e `finance.tithes` possuem telas próprias na categoria Financeiro; **Visão financeira** é a primeira opção. A interface de `finance.transactions` foi retirada da navegação e seu endereço principal redireciona para a Visão financeira, mantendo o domínio e o histórico existentes. `finance.reports` permanece reservada para evolução futura. O contexto ativo limita os dados à igreja selecionada, enquanto **Visão geral** consolida todas as áreas e igrejas exclusivamente para o administrador global. O domínio e a evolução do módulo estão em [`docs/finance`](finance/financial-implementation-context.md).
 
 A categoria Administração exibe, nesta ordem: Usuários, Cargos e permissões e Departamentos. A matriz exibida em um cargo usa as mesmas categorias dos módulos cadastrados.
 

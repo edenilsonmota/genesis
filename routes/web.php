@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\ChurchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\Finance\FinancialOverviewController;
 use App\Http\Controllers\Finance\FinancialTransactionController;
 use App\Http\Controllers\Finance\TitheController;
 use App\Http\Controllers\MemberController;
@@ -67,6 +68,7 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
         Route::put('/positions/{position}/permissions', [PositionController::class, 'updatePermissions'])->name('positions.permissions.update');
 
         Route::prefix('finance')->name('finance.')->group(function (): void {
+            Route::get('/overview', FinancialOverviewController::class)->name('overview.index');
             Route::prefix('tithes')->name('tithes.')->group(function (): void {
                 Route::get('/', [TitheController::class, 'index'])->name('index');
                 Route::post('/', [TitheController::class, 'store'])->name('store');
@@ -75,7 +77,7 @@ Route::middleware(['auth', 'user.active', 'system.access'])->group(function (): 
                 Route::post('/{financialTransaction}/reverse', [TitheController::class, 'reverse'])->name('reverse');
             });
             Route::prefix('transactions')->name('transactions.')->group(function (): void {
-                Route::get('/', [FinancialTransactionController::class, 'index'])->name('index');
+                Route::redirect('/', '/finance/overview')->name('index');
                 Route::get('/create', [FinancialTransactionController::class, 'create'])->name('create');
                 Route::post('/income', [FinancialTransactionController::class, 'storeIncome'])->name('income.store');
                 Route::post('/expenses', [FinancialTransactionController::class, 'storeExpense'])->name('expenses.store');
